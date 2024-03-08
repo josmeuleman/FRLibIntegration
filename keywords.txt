@@ -1,0 +1,67 @@
+Button	KEYWORD1
+SetPinNumber	KEYWORD2
+Update	KEYWORD2
+GetState	KEYWORD2
+HasChanged	KEYWORD2
+HasChangedUp	KEYWORD2
+HasChangedDown	KEYWORD2
+
+LED	KEYWORD1
+SetPinNumber	KEYWORD2
+SetState	KEYWORD2
+SetOn	KEYWORD2
+SetOff	KEYWORD2
+Toggle	KEYWORD2
+SetBlink	KEYWORD2
+
+PPMReceiver	KEYWORD1
+SetLowPassFilter	KEYWORD2
+GetLowPassFilter	KEYWORD2
+Update	KEYWORD2
+ReadChannel	KEYWORD2
+
+Timer	KEYWORD1
+SetLoopTime	KEYWORD2
+Start	KEYWORD2
+WaitUntilEnd	KEYWORD2
+GetLoopDuration	KEYWORD2
+LoopTimePassed	KEYWORD2
+
+Logger	KEYWORD1
+CheckSD	KEYWORD2
+AddSensor	KEYWORD2
+GetLoggerFileName	KEYWORD2
+IsLogging	KEYWORD2
+StartLogger	KEYWORD2
+StopLogger	KEYWORD2
+UpdateSensors	KEYWORD2
+WriteLogger	KEYWORD2
+
+SensorManager	KEYWORD1
+HeaderString	KEYWORD2
+SensorString	KEYWORD2
+
+TinyGPSManager	KEYWORD1
+Init	KEYWORD2
+
+Ms4525doManager	KEYWORD1
+Init	KEYWORD2
+
+MPU6050Manager	KEYWORD1
+Init	KEYWORD2
+
+AnalogInputManager	KEYWORD1
+SetPinNumber	KEYWORD2
+SetHeaderString	KEYWORD2
+SetOutputRange	KEYWORD2
+
+PPMReceiverManager	KEYWORD1
+Init	KEYWORD2
+SetPrefix	KEYWORD2
+ReadChannel	KEYWORD2
+
+createTimeString	KEYWORD2
+createDateString	KEYWORD2
+createFloatString	KEYWORD2
+createIntString	KEYWORD2
+mapf	KEYWORD2
