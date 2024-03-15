@@ -19,7 +19,8 @@ class FRBMP280 : public FRSensor {
 
     private:
         Adafruit_BMP280* _myBMP;
-        static const int MY_BMP280_ADDRESS = 0x76;
+        static const int BMP280_ADDRESS = 0x76;
+		float _offetPressure;
 };
 
 #endif
