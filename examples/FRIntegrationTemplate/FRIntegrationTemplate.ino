@@ -23,8 +23,10 @@
 #include <FRLogger.h>
 #include <FRLED.h>
 #include <FRButton.h>
-#include <FRMPU6050Manager.h>  //Use a custom library that internally initializes and logs the MPU6050 so you don't need #include <Adafruit_MPU6050.h>
-#include <FRPPMReceiverManager.h>
+#include <FRPPMReceiver.h>
+//#include <FRMPU9250.h>
+//#include <FRAS5600.h>
+#include <FRBMP280.h>
 
 // Some switches have three states. We make constants defining LOSTATE (-1), MIDSTATE (0) and HISTATE(1)
 typedef enum triStateSwitch {
@@ -34,16 +36,17 @@ typedef enum triStateSwitch {
 };
 
 const byte NUMBEROFSERVOS = 4;      // Number of servos 
-const int I2C_SDA = 33;             // The data pin for I2C communication
-const int I2C_SCL = 32;             // The clock pin for I2C communcation
-const int PINSWITCH = 22;           // The pin number for he button to start and stop logging
-const int PINLED = 21;              // The pin number for the LED
-const int PINAD = 34;               // Analog input pin number
-const int PINSERVO[NUMBEROFSERVOS] = {25, 26, 27, 14}; // Servo Channels
-const int PINPPM2 = 4;              // PM2 input pint
-const int LOOPTIMELOGGERMS = 100;   // Loop time for reading the AD channel in milliseconds
-const int LOOPTIMESERVOMS = 10;     // Loop time for reading the AD channel in milliseconds
-const int NUMBEROFCHANNELS2 = 8;    // Number of Channels of Receiver2
+const byte NUMBEROFCHANNELS2 = 8;    // Number of Channels of Receiver2
+
+const byte I2C_SDA = 21;             // The data pin for I2C communication
+const byte I2C_SCL = 22;             // The clock pin for I2C communcation
+const byte PINSWITCH = 35;           // The pin number for he button to start and stop logging
+const byte PINLED = 12;              // The pin number for the LED
+const byte PINSERVO[NUMBEROFSERVOS] = {25, 26, 27, 14}; // Servo Channels
+const byte PINPPM2 = 4;              // PM2 input pint
+
+const int  LOOPTIMELOGGERMS = 100;   // Loop time for reading the AD channel in milliseconds
+const int  LOOPTIMESERVOMS = 10;     // Loop time for reading the AD channel in milliseconds
 
 
 // Create all objects
@@ -53,10 +56,11 @@ Timer servoTimer(LOOPTIMESERVOMS);    // Timer object for the clock
 Logger myLogger;                    // Logger object for logging sensors to the SD
 Button myButton(PINSWITCH, true);   // Create a button object with the given pin. True for an inverted button, false for a normal button
 LED myLed(PINLED);                  // Create a led object with the given pin.
-MPU6050Manager myMPU;               // Make an object for the sensor manager for the MPU6050 (accelerometer and gyro)
+//MPU6050Manager myMPU;               // Make an object for the sensor manager for the MPU6050 (accelerometer and gyro)
 Servo myServo[NUMBEROFSERVOS];      // create a servo object
+FRBMP280 myBMP;
 
-PPMReceiverManager receiver2(PINPPM2, NUMBEROFCHANNELS2);  // Create a PPM receiver object with given pin and number of channels
+FRPPMReceiver receiver2(PINPPM2, NUMBEROFCHANNELS2);  // Create a PPM receiver object with given pin and number of channels
 int channelValues[NUMBEROFCHANNELS2];
 // Suggestion for signal mapping
 // channel0 - tick up --> handle cargo drop servo
@@ -109,16 +113,21 @@ void setup() {
   Wire.setClock(400000);
 
   // The Wire connection must be made before initializing the MPU
-  if (!myMPU.Init(Wire, MPU6050_RANGE_4_G, MPU6050_RANGE_500_DEG)) {
-    Error("MPU not found!");
+  // if (!myMPU.Init(Wire, MPU6050_RANGE_4_G, MPU6050_RANGE_500_DEG)) {
+  //   Error("MPU not found!");
+  // }
+  if (!myBMP.Init(Wire)) {
+    Error("BMP not found!");
   }
+  
   receiver2.Init();
 
   if (!myLogger.CheckSD()) {
     Error("No SD card found!");
   }
 
-  myLogger.AddSensor(&myMPU);
+  //myLogger.AddSensor(&myMPU);
+  myLogger.AddSensor(&myBMP);
 
   loggerTimer.Start();
   servoTimer.Start();
@@ -211,7 +220,7 @@ void loop() {
   // Check if it is time to log the data
   if (loggerTimer.LoopTimePassed()) {
     String myString = myLogger.UpdateSensors();  // Updates all connected sensors and generates a string of all sensor values;
-    //Serial.print(myString);                      // Writing to the Serial Monitor will sometimes take more than 100 ms. So print to screen only when you have a slow update rate.
+    Serial.print(myString);                      // Writing to the Serial Monitor will sometimes take more than 100 ms. So print to screen only when you have a slow update rate.
     myLogger.WriteLogger();                      // Only writes to logger if myLogger. IsLogging is true;
   }
 
