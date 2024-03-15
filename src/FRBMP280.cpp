@@ -14,26 +14,27 @@ FRBMP280::~FRBMP280(){
 }
 
 bool FRBMP280::Init(TwoWire &myWire){
-    if (!_myBMP->begin(MY_BMP280_ADDRESS)) {
+    if (!_myBMP->begin(BMP280_ADDRESS)) {
         return false;
     }
+	_offetPressure = _myBMP->readPressure();
     return true;
 }
 
 String FRBMP280::HeaderString(){
     String tempString;
-    tempString.concat("Temperature; ");
     tempString.concat("Pressure; ");
     tempString.concat("Approx altitude; ");
+    tempString.concat("Temperature; ");
     return tempString;
 }
 
 String FRBMP280::SensorString(){
     String tempString;
 
-    tempString.concat(createFloatString(_myBMP->readTemperature(), 2));
     tempString.concat(createFloatString(_myBMP->readPressure(), 2));
-    tempString.concat(createFloatString(_myBMP->readAltitude(1026.7), 2)); // Adjust for local pressure!!
+    tempString.concat(createFloatString(_myBMP->readAltitude(_offetPressure), 2)); // Adjust for local pressure!!
+    tempString.concat(createFloatString(_myBMP->readTemperature(), 2));
 
     return tempString;
 }
