@@ -14,10 +14,10 @@ FRBMP280::~FRBMP280(){
 }
 
 bool FRBMP280::Init(TwoWire &myWire){
-    if (!_myBMP->begin(BMP280_ADDRESS)) {
+    if (!_myBMP->begin(BMP280_ADDRESS_ALT)) {
         return false;
     }
-	_offetPressure = _myBMP->readPressure();
+	_offetPressure = _myBMP->readPressure()/100;
     return true;
 }
 
