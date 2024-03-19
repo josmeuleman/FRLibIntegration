@@ -2,7 +2,6 @@
 // 
 // 2024-03-15, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
 
-
 #ifndef FRAS5600_h
 #define FRAS5600_h
 
@@ -11,15 +10,18 @@
 #include <Wire.h>
 
 class FRAS5600 : public FRSensor {
-public:
-    FRAS5600();
-    ~FRAS5600();
-    bool Init();
-    String HeaderString() override;
-    String SensorString() override;
+	public:
+		FRAS5600();
+		~FRAS5600();
+		bool Init();
+		bool Init(float offsetAngle);
+		void SetOffsetAngle(float offsetAngle);
+		
+		String HeaderString() override;
+		String SensorString() override;
 
-private:
-    AS5600* _myAS5600;
+	private:
+		AS5600* _myAS5600;
 };
 
 #endif
