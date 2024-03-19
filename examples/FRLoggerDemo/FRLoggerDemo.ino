@@ -19,7 +19,7 @@
 // Libraries from FRLibBasics
 #include <FRTimer.h>
 #include <FRLogger.h>
-#include <FRLED.h>
+#include <FRRGBLED.h>
 #include <FRButton.h>
 // Libraries from FRLibIntegration
 #include <FRAS5600.h> //special library logging for AS5600
@@ -29,14 +29,13 @@
 const byte I2C_SDA = 21;                // The data pin for I2C communication
 const byte I2C_SCL = 22;                // The clock pin for I2C communcation
 const int PINSWITCH = 35;               // The pin number for he button to start and stop logging
-const int PINLED = 21;                  // The pin number for the LED
 const int LOOPTIMEMS = 100;             // Loop time for reading the AD channel in milliseconds
 
 // Create all objects
 Timer myTimer(LOOPTIMEMS);              // Timer object for the clock
 Logger myLogger;                        // Logger object for logging sensors to the SD
 Button myButton(PINSWITCH, true);       // Create a button object with the given pin. True for an inverted button, false for a normal button
-LED myLed(PINLED);                      // Create a led object with the given pin.
+RGBLED myLed;                           // Create a RGB led object. pinnummbers are defined in the library FRRGBLED.h.
 FRBMP280 myAltitudeSensor;
 FRAS5600 myAngleOfAttackSensor;    
 
@@ -46,7 +45,9 @@ FRAS5600 myAngleOfAttackSensor;
 // This block of code is only run once at the beginning
 //---------------------------------------------------------------------------------------------------------
 void setup() {
+  myLed.SetColor(MAGENTA);
   Serial.begin(9600);
+  Serial.println("Setup ");
   
   // Start the serial communciation for all I2C sensors
   Wire.begin(I2C_SDA, I2C_SCL);
@@ -69,8 +70,10 @@ void setup() {
   myLogger.AddSensor(&myAltitudeSensor);
   myLogger.AddSensor(&myAngleOfAttackSensor);
 
+
   myTimer.Start();
-  
+  Serial.println("End of Setup");
+  myLed.SetColor(GREEN);
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -87,7 +90,7 @@ void loop() {
         Error("Something went wrong with the start of the log");
       }
       else {
-        myLed.SetOn();
+        myLed.SetColor(BLUE);
         Serial.print("File opened with the name: ");
         Serial.println(myLogger.GetLoggerFileName());
       }
@@ -97,13 +100,13 @@ void loop() {
         Error("Something went wrong with the stopping of the log");
       }
       else {
-        myLed.SetOff();
+        myLed.SetColor(GREEN);
       }
     }
   }
 
   String myString = myLogger.UpdateSensors(); // Updates all connected sensors and generates a string of all sensor values;
-  //Serial.print(myString); // Writing to the Serial Monitor will sometimes take more than 100 ms. So print to screen only when you have a slow update rate. 
+  Serial.print(myString); // Writing to the Serial Monitor will sometimes take more than 100 ms. So print to screen only when you have a slow update rate. 
   myLogger.WriteLogger(); // Only writes to logger if myLogger.IsLogging is true;
 
   if (myTimer.WaitUntilEnd()) {
@@ -116,6 +119,9 @@ void loop() {
 // Here the custom functions are defined
 //---------------------------------------------------------------------------------------------------------
 void Error(String errorMessage){
+  myLed.SetColor(RED);
   Serial.println(errorMessage);
-  myLed.SetBlink(100);
 }
+
+
+
