@@ -27,6 +27,15 @@ void FRAS5600::SetOffsetAngle(float offsetAngle) {
 	_myAS5600->setOffset(-offsetAngle);
 }
 
+void FRAS5600::AutoOffset(){
+	_myAS5600->setOffset(-GetAngle());
+}
+
+float FRAS5600::GetAngle() {
+	return _myAS5600->readAngle()*AS5600_RAW_TO_DEGREES;
+}
+
+
 String FRAS5600::HeaderString(){
     String tempString;
     tempString.concat("Angle; ");
@@ -35,6 +44,6 @@ String FRAS5600::HeaderString(){
 
 String FRAS5600::SensorString(){
     String tempString;
-    tempString.concat(createFloatString(_myAS5600->readAngle()*AS5600_RAW_TO_DEGREES, 2));
+    tempString.concat(createFloatString(this->GetAngle(), 2));
     return tempString;
 }
