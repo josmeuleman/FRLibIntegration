@@ -1,35 +1,35 @@
-// Testscript for Recording MPU and analog data to an SD card for  Flight Recorder PCB
+// Testscript for recording sensors to an SD card for Flight Recorder PCB v2
+// This script logs a few sensors and can be extended with more
 // Required hardware:
-// - 1x Flight Recorder Board with ESP32
-// - 1x MPU6050
+// - 1x Flight Recorder Board v2 with ESP32 
+// - 1x Angular Sensor (AS5600)
+// - 1x Altitude Sensoor (BMP280)
 // - 1x SD Card reader
-// - 1x Potmeter
 // Connections:
-// - Potmeter1, GND - Analog Input J6, GND
-// - Potmeter1, Wiper - Analog Input J6, D35
-// - Potmeter1, VCC - Analog Input J6, 3.3V
-// - GPS mounted on board
+// - components mounted on board 
 // - SD card reader mounted on board
 // Required libraries:
-// - FRLib (download from https://github.com/josmeuleman/FRLib, unzipped in ../Documents/Arduino/libraries/ )
+// - FRLibBasics (download from https://github.com/josmeuleman/FRLibBasics, unzipped in ../Documents/Arduino/libraries/ )
+// - FRLibIntegration (download from https://github.com/josmeuleman/FRLibIntegration, unzipped in ../Documents/Arduino/libraries/ )
 // - Adafruit_MPU6050.h
 //
 // 2023-04-05, Jos Meuleman, Inholland Aeronautical & Precision Engineering, The Netherlands
 
 
+// Libraries from FRLibBasics
 #include <FRTimer.h>
 #include <FRLogger.h>
 #include <FRLED.h>
 #include <FRButton.h>
-#include <FRMPU6050Manager.h> //Use a custom library that internally initializes and logs the MPU6050 so you don't need #include <Adafruit_MPU6050.h>  
-#include <FRAnalogInputManager.h>
+// Libraries from FRLibIntegration
+#include <FRAS5600.h> //special library logging for AS5600
+#include <FRBMP280.h> //special library logging for BMP280
 
 
-const int I2C_SDA = 33;                 // The data pin for I2C communication
-const int I2C_SCL = 32;                 // The clock pin for I2C communcation
-const int PINSWITCH = 22;               // The pin number for he button to start and stop logging
+const byte I2C_SDA = 21;                // The data pin for I2C communication
+const byte I2C_SCL = 22;                // The clock pin for I2C communcation
+const int PINSWITCH = 35;               // The pin number for he button to start and stop logging
 const int PINLED = 21;                  // The pin number for the LED
-const int PINAD = 34;                   // Analog input pin number
 const int LOOPTIMEMS = 100;             // Loop time for reading the AD channel in milliseconds
 
 // Create all objects
@@ -37,8 +37,8 @@ Timer myTimer(LOOPTIMEMS);              // Timer object for the clock
 Logger myLogger;                        // Logger object for logging sensors to the SD
 Button myButton(PINSWITCH, true);       // Create a button object with the given pin. True for an inverted button, false for a normal button
 LED myLed(PINLED);                      // Create a led object with the given pin.
-MPU6050Manager myMPU;                   // Make an object for the sensor manager for the MPU6050 (accelerometer and gyro)
-AnalogInputManager myAnalog1(PINAD, "AlphaVane[deg]");            
+FRBMP280 myAltitudeSensor;
+FRAS5600 myAngleOfAttackSensor;    
 
 
 //---------------------------------------------------------------------------------------------------------
@@ -46,23 +46,28 @@ AnalogInputManager myAnalog1(PINAD, "AlphaVane[deg]");
 // This block of code is only run once at the beginning
 //---------------------------------------------------------------------------------------------------------
 void setup() {
-  Serial.begin(9600);     // Start the serial communciation
+  Serial.begin(9600);
+  
+  // Start the serial communciation for all I2C sensors
   Wire.begin(I2C_SDA, I2C_SCL);
   Wire.setClock(400000);
   
-  // The Wire connection must be made before initializing the MPU
-  if (!myMPU.Init(Wire, MPU6050_RANGE_4_G, MPU6050_RANGE_500_DEG)) {
-    Error("MPU not found!");
+  // Initialize each sensor object. Give an error on failure
+  if (!myAltitudeSensor.Init(Wire)) {
+    Error("Altitude sensor (BMP280) not found!");
   }
-
+  if (!myAngleOfAttackSensor.Init()) {
+    Error("Angle of Attack Sensor (AS5600) not found!");
+  }
   if (!myLogger.CheckSD()) {
     Error("No SD card found!");
   }
-  
-  myAnalog1.SetOutputRange(-135.0, 135.0);
-  
-  myLogger.AddSensor(&myAnalog1); // Add the analog sensor to the logger. the "&" means that the logger watches the address of the analog sensor 
-  myLogger.AddSensor(&myMPU);
+    
+  // Add the sensors to the logger
+  // The "&" sign means that the sensor gets the address of the sensor object (pointer)
+  // The logger now can read updates from the sensor
+  myLogger.AddSensor(&myAltitudeSensor);
+  myLogger.AddSensor(&myAngleOfAttackSensor);
 
   myTimer.Start();
   
@@ -99,7 +104,7 @@ void loop() {
 
   String myString = myLogger.UpdateSensors(); // Updates all connected sensors and generates a string of all sensor values;
   //Serial.print(myString); // Writing to the Serial Monitor will sometimes take more than 100 ms. So print to screen only when you have a slow update rate. 
-  myLogger.WriteLogger(); // Only writes to logger if myLogger. IsLogging is true;
+  myLogger.WriteLogger(); // Only writes to logger if myLogger.IsLogging is true;
 
   if (myTimer.WaitUntilEnd()) {
     Serial.println("Overrun!");
