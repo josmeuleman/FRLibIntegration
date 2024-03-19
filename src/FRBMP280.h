@@ -14,13 +14,14 @@ class FRBMP280 : public FRSensor {
         FRBMP280();
         ~FRBMP280();
         bool Init(TwoWire &myWire);
+		void AutoOffset();
+		void SetOffsetPressurehPa(float inPressure);
         String HeaderString() override;
         String SensorString() override;
 
     private:
         Adafruit_BMP280* _myBMP;
-        //static const int BMP280_ADDRESS = 0x76;
-		float _offetPressure;
+        float _offsetPressure = 1013.25;
 };
 
 #endif
