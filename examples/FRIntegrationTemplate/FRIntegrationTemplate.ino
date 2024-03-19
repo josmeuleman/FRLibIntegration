@@ -25,7 +25,7 @@
 #include <FRButton.h>
 #include <FRPPMReceiver.h>
 //#include <FRMPU9250.h>
-//#include <FRAS5600.h>
+#include <FRAS5600.h>
 #include <FRBMP280.h>
 
 // Some switches have three states. We make constants defining LOSTATE (-1), MIDSTATE (0) and HISTATE(1)
@@ -58,7 +58,8 @@ Button myButton(PINSWITCH, true);   // Create a button object with the given pin
 LED myLed(PINLED);                  // Create a led object with the given pin.
 //MPU6050Manager myMPU;               // Make an object for the sensor manager for the MPU6050 (accelerometer and gyro)
 Servo myServo[NUMBEROFSERVOS];      // create a servo object
-FRBMP280 myBMP;
+FRBMP280 myAltitudeSensor;
+FRAS5600 myAngleOfAttackSensor;
 
 FRPPMReceiver receiver2(PINPPM2, NUMBEROFCHANNELS2);  // Create a PPM receiver object with given pin and number of channels
 int channelValues[NUMBEROFCHANNELS2];
@@ -116,10 +117,15 @@ void setup() {
   // if (!myMPU.Init(Wire, MPU6050_RANGE_4_G, MPU6050_RANGE_500_DEG)) {
   //   Error("MPU not found!");
   // }
-  if (!myBMP.Init(Wire)) {
-    Error("BMP not found!");
+  if (!myAltitudeSensor.Init(Wire)) {
+    Error("Altitude sensor (BMP280) not found!");
   }
+  if (!myAngleOfAttackSensor.Init()) {
+    Error("Angle of Attack Sensor (AS5600) not found!");
+  }
+  myAngleOfAttackSensor.SetOffsetAngle(15.0);
   
+
   receiver2.Init();
 
   if (!myLogger.CheckSD()) {
@@ -127,7 +133,9 @@ void setup() {
   }
 
   //myLogger.AddSensor(&myMPU);
-  myLogger.AddSensor(&myBMP);
+  myLogger.AddSensor(&myAltitudeSensor);
+  myLogger.AddSensor(&myAngleOfAttackSensor);
+  
 
   loggerTimer.Start();
   servoTimer.Start();
