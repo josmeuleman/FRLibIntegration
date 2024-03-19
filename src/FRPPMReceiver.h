@@ -8,22 +8,36 @@
 
 #include <FRSensor.h>
 
+// Threshold for discrete PPM signals
+const int PPMTHRESHLOW = 850;
+const int PPMTHRESHMID = 1100;
+const int PPMTHRESHHIGH = 1350;
+
+// Some switches have three states. We make constants defining LOSTATE (-1), MIDSTATE (0) and HISTATE(1)
+typedef enum triStateSwitch {
+  LOSTATE = -1,
+  MIDSTATE,
+  HISTATE
+};
+
 class FRPPMReceiver : public FRSensor{
   public:
-  FRPPMReceiver(int pinNumber, int numberOfChannels);
+  FRPPMReceiver(byte pinNumber, byte numberOfChannels);
   ~FRPPMReceiver();
   
   void Init();
   void SetPrefix(String prefix);
   
-  int ReadChannel(int ChannelNumber);
+  int ReadChannel(byte ChannelNumber);
+  bool IsChannelHigh(byte ChannelNumber);
+  triStateSwitch GetChannelTriState(byte ChannelNumber);
   
   String HeaderString() override;
   String SensorString() override;
   
   private:
-  int _pinNumber;
-  int _numberOfChannels;
+  byte _pinNumber;
+  byte _numberOfChannels;
   static volatile unsigned long _lastPulseUS;
   static volatile uint16_t _channel;
   static volatile int* _channelValues;
