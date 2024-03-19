@@ -3,7 +3,7 @@
 // Required hardware:
 // - 1x Flight Recorder Board v2 with ESP32
 // - 1x Angular Sensor (AS5600)
-// - 1x Altitude Sensoor (BMP280)
+// - 1x Altitude Sensor (BMP280)
 // - 1x SD Card reader
 // Connections:
 // - components mounted on board
@@ -11,7 +11,8 @@
 // Required libraries:
 // - FRLibBasics (download from https://github.com/josmeuleman/FRLibBasics, unzipped in ../Documents/Arduino/libraries/ )
 // - FRLibIntegration (download from https://github.com/josmeuleman/FRLibIntegration, unzipped in ../Documents/Arduino/libraries/ )
-// - Adafruit_MPU6050.h
+// - AS5600 Rob Tillaart (tested on 0.6.0)
+// - Adafruit_BMP280.h (tested on 2.6.8)
 //
 // 2023-04-05, Jos Meuleman, Inholland Aeronautical & Precision Engineering, The Netherlands
 
