@@ -6,7 +6,7 @@
 #include "FRGeneric.h"
 
 FRAS5600::FRAS5600(){
-    _myAS5600 = new AS5600();
+    _myAS5600 = new FRAS5600();
 }
 
 FRAS5600::~FRAS5600(){
