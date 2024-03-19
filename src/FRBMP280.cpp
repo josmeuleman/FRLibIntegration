@@ -17,9 +17,17 @@ bool FRBMP280::Init(TwoWire &myWire){
     if (!_myBMP->begin(BMP280_ADDRESS_ALT)) {
         return false;
     }
-	_offetPressure = _myBMP->readPressure()/100;
     return true;
 }
+
+void FRBMP280::AutoOffset(){
+	_offsetPressure = _myBMP->readPressure()/100;
+}
+
+void FRBMP280::SetOffsetPressurehPa(float inPressure) {
+	_offsetPressure = inPressure;
+}
+
 
 String FRBMP280::HeaderString(){
     String tempString;
@@ -33,7 +41,7 @@ String FRBMP280::SensorString(){
     String tempString;
 
     tempString.concat(createFloatString(_myBMP->readPressure(), 2));
-    tempString.concat(createFloatString(_myBMP->readAltitude(_offetPressure), 2)); // Adjust for local pressure!!
+    tempString.concat(createFloatString(_myBMP->readAltitude(_offsetPressure), 2)); // Adjust for local pressure!!
     tempString.concat(createFloatString(_myBMP->readTemperature(), 2));
 
     return tempString;
