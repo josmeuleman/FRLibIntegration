@@ -14,7 +14,7 @@
 // - AS5600 Rob Tillaart (tested on 0.6.0)
 // - Adafruit_BMP280.h (tested on 2.6.8)
 //
-// 2023-04-05, Jos Meuleman, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2024-03-20, Jos Meuleman, Inholland Aeronautical & Precision Engineering, The Netherlands
 
 
 // Libraries from FRLibBasics
@@ -22,14 +22,17 @@
 #include <FRLogger.h>
 #include <FRRGBLED.h>
 #include <FRButton.h>
+
 // Libraries from FRLibIntegration
 #include <FRAS5600.h>  //special library logging for AS5600
 #include <FRBMP280.h>  //special library logging for BMP280
 
-
+// Pins
 const byte I2C_SDA = 21;     // The data pin for I2C communication
 const byte I2C_SCL = 22;     // The clock pin for I2C communcation
-const int PINSWITCH = 35;    // The pin number for he button to start and stop logging
+const byte PINSWITCH = 35;    // The pin number for he button to start and stop logging
+
+// other constants
 const int LOOPTIMEMS = 100;  // Loop time for reading the AD channel in milliseconds
 
 // Create all objects
@@ -58,7 +61,7 @@ void setup() {
   }
 
 
-  // Start the serial communciation for all I2C sensors
+  // Start the serial communication for all I2C sensors
   Wire.begin(I2C_SDA, I2C_SCL);
   Wire.setClock(400000);
 
@@ -85,7 +88,7 @@ void setup() {
   myLogger.AddSensor(&myAltitudeSensor);
   myLogger.AddSensor(&myAngleOfAttackSensor);
 
-
+  // At the end of the setup, start the clock (for calculation loop durations)
   myTimer.Start();
   Serial.println("End of Setup");
   myLed.SetColor(GREEN);
@@ -98,20 +101,20 @@ void setup() {
 void loop() {
 
   //-------------------------------------------------------------------------------------------------------
-  // Start or stop logger
+  // Start or stop logger, depending on the button state
   //-------------------------------------------------------------------------------------------------------
   myButton.Update();              // Read the state of the button
   if (myButton.HasChangedUp()) {  //Check if the state has changed from low to high
-    if (!myLogger.IsLogging()) {  // Start logging
+    if (!myLogger.IsLogging()) {  // It wasn't logging yet, so start logging
       Serial.println("Start logging");
       if (!myLogger.StartLogger()) {
         Error("Something went wrong with the start of the log");
-      } else {
+      } else { // the actual start of the logging
         myLed.SetColor(BLUE);
         Serial.print("File opened with the name: ");
         Serial.println(myLogger.GetLoggerFileName());
       }
-    } else {  // Stop logging
+    } else {  // Else we were logging, so now stop logging
       Serial.println("Stop logging");
       if (!myLogger.StopLogger()) {
         Error("Something went wrong with the stopping of the log");
@@ -126,12 +129,12 @@ void loop() {
   //-------------------------------------------------------------------------------------------------------
   String myString = myLogger.UpdateSensors();  // Updates all connected sensors and generates a string of all sensor values;
   Serial.print(myString);                      // Writing to the Serial Monitor will sometimes take more than 100 ms. So print to screen only when you have a slow update rate.
-  myLogger.WriteLogger();                      // Only writes to logger if myLogger.IsLogging is true;
+  myLogger.WriteLogger();                      // This will only write to logger if myLogger.IsLogging is true;
 
   //-------------------------------------------------------------------------------------------------------
   // End of the loop
   //-------------------------------------------------------------------------------------------------------
-  // Kill the time until
+  // At the end of the loop, WaitUntilEnd runs until the time until looptime has passed
   if (myTimer.WaitUntilEnd()) {
     Serial.println("Overrun!"); // if there are delays in the loop, you will get overruns i.e. the loop took longer than the looptime
   }
@@ -162,21 +165,18 @@ bool hasButtonBeenPressedDuringWait(int waitTimeSec) {
   bool continueLoop = true;  // continue the loop until this is false
   while (continueLoop) {
     myButton.Update();
-
-    // button has been pushed, return true and quit the loop
-    if (myButton.HasChangedUp()) {
+    
+    if (myButton.HasChangedUp()) { // button has been pushed, return true and quit the while loop
       isPressed = true;
       continueLoop = false;
     }
-
-    // Time out, quite the loop
-    if ((millis() - tStart) > waitTimeSec * 1000) {
+    
+    if ((millis() - tStart) > waitTimeSec * 1000) { // Time out, quite the while loop
       continueLoop = false;
-    } else {  // keep on running
-      delay(100);
-      Serial.print('-');  // running bar
     }
+    delay(100);
+    Serial.print('-');  // running bar
   }
   Serial.println();
-  return isPressed;
+  return isPressed; // returns true if the button was pressed during this process, else false
 }
