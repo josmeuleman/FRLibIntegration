@@ -17,17 +17,8 @@
 
 #include <ESP32Servo.h>
 #include <FRTimer.h>
-#include <FRLogger.h>
-#include <FRLED.h>
 #include <FRButton.h>
 #include <FRPPMReceiver.h>
-
-// Some switches have three states. We make constants defining LOSTATE (-1), MIDSTATE (0) and HISTATE(1)
-// typedef enum triStateSwitch {
-//   LOSTATE = -1,
-//   MIDSTATE,
-//   HISTATE
-// };
 
 const byte NUMBEROFSERVOS = 4;       // Number of servos 
 const byte NUMBEROFCHANNELS = 8;     // Number of Channels of myReceiver
