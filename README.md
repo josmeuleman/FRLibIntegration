@@ -2,9 +2,18 @@
 Integration FlightRecorder Library for Arduino IDE. This library contains sublibraries and examples for making a flight recorder for an ESP32.
 The library is written for the Project2.2 for Aeronautical & Precision Engineerring at Inholland, Delft.
 The library is updated for Flight Recorder Board V2
+
 Dependencies:
--FRLibBasics
--
+- FRLibBasics
+  - FRGeneric.h
+  - FRButton.h
+  - FRLED.h
+  - FRRGBLED.h
+  - FRTimer.h
+- ESP32Servo.h 
+- SSD1306Ascii.h for OLED
+- SSD1306AsciiWire.h for OLED
+
 
 ## FRPPMReceiver
 The PPMReceiver class creates a listener to a PPM signal.
@@ -17,8 +26,6 @@ Methods:
     void Update();
     float ReadChannel(int ChannelNumber);
 
-Examples:
-- FRPPMReceiverTest.ino
 
 ## FRLogger
 The Logger class creates a handler for logging data to an SD cards. The FRLogger uses a generic sensor class, FRSensorManager. For the usage of FRSensorManager, see next section.
