@@ -29,7 +29,8 @@ bool FRMS4525DO::Init(TwoWire &myWire){
 
 String FRMS4525DO::HeaderString(){
   String tempString;
-  tempString.concat("pressure [Pa]; ");
+  tempString.concat("delta pressure [Pa]; ");
+  tempString.concat("speed [m/s]; ");
   tempString.concat("tempPitot [degC]; ");
   return tempString;
 }
@@ -38,7 +39,8 @@ String FRMS4525DO::SensorString(){
   _myPitot->Read();
   String tempString;
   
-  tempString.concat(createFloatString(_myPitot->pres_pa(), 3));
+  tempString.concat(createFloatString(GetPressure(), 2));
+  tempString.concat(createFloatString(GetSpeed(), 2));
   tempString.concat(createFloatString(_myPitot->die_temp_c(), 1));
   
   return tempString;
