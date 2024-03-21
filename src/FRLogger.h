@@ -23,6 +23,9 @@ class Logger{
   bool CheckSD();
   void AddSensor(FRSensor* Sensor);
   String GetLoggerFileName();
+  
+  String GetHeaderString() { return _headerString; }
+  String GetSensorString() { return _loggerString; }
 
   bool IsLogging();
   bool StartLogger();
@@ -41,6 +44,7 @@ class Logger{
   String _fileName;
   File _file;
   String _loggerString;
+  String _headerString;
   
 };
 
