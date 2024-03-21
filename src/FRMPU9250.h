@@ -1,6 +1,6 @@
 // Wrapper for a MPU9250 sensor. It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
-// 2024-03-07, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2024-03-21, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
 
 #ifndef FRMPU9250_h
 #define FRMPU9250_h
