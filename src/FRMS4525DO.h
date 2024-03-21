@@ -11,16 +11,23 @@
 
 //creates class which inherents Sensor
 class FRMS4525DO : public FRSensor {
-  public :
-  FRMS4525DO();
-  virtual ~FRMS4525DO(); // Add a destructor
-  bool Init(TwoWire &myWire);
-  String HeaderString() override;
-  String SensorString() override;
+	public :
+		FRMS4525DO();
+		virtual ~FRMS4525DO(); // Add a destructor
+		bool Init(TwoWire &myWire);
 
-  private :
-  bfs::Ms4525do* _myPitot; 
-  const int PITOT_I2C_ADDRESS = 0x28;     // I2C address of the Pitot sensor
+		float GetPressure() { return _myPitot->pres_pa()-p0; }
+		void AutoOffset() { p0 = GetPressure(); }
+		float GetSpeed() { return sqrt( 2.0 * GetPressure() / rho ); }
+
+		String HeaderString() override;
+		String SensorString() override;
+
+	private :
+		bfs::Ms4525do* _myPitot; 
+		const int PITOT_I2C_ADDRESS = 0x28;     // I2C address of the Pitot sensor
+		float p0 = 0.0;
+		float rho = 1.204; // Density of air at 20 deg at 1013 hPa
 };
 
 #endif
