@@ -18,7 +18,7 @@ class FRMS4525DO : public FRSensor {
 
 		float GetPressure() { return _myPitot->pres_pa()-p0; }
 		void AutoOffset() { p0 = GetPressure(); }
-		float GetSpeed() { return sqrt( 2.0 * GetPressure() / rho ); }
+		float GetSpeed() { return sqrt( 2.0 * abs(GetPressure()) / rho ); }
 
 		String HeaderString() override;
 		String SensorString() override;
