@@ -10,30 +10,21 @@ Dependencies:
   - FRLED.h
   - FRRGBLED.h
   - FRTimer.h
-- AS5600.h for angular sensor (angle of attack)
+- AS5600.h by Rob Tillaart for angular sensor (angle of attack)
 - Adafruit_BMP280.h for pressure sensor (altitude)
-- ESP32Servo.h 
+- ESP32Servo.h
+- MPU9250.h by Bolder Flight Systems for the IMU. Dependencies:
+  - Eigen.h by Bolder Flight Systems
+  - Units.h by Bolder Flight Systems
+- ms4525do.h by Bolder Flight Systems  
+- TinyGPSPlus-ESP32.h by Mikal Hart  
 - SSD1306Ascii.h for OLED
 - SSD1306AsciiWire.h for OLED
 
-
-## FRPPMReceiver
-The PPMReceiver class creates a listener to a PPM signal.
-Methods:
-
-    #include <FRPPMReceiver.h>
-	PPMReceiver(int pinNumber, int numberOfChannels);
-    void SetLowPassFilter(float* alphaValues);
-    float GetLowPassFilter(int channel);
-    void Update();
-    float ReadChannel(int ChannelNumber);
-
-
 ## FRLogger
-The Logger class creates a handler for logging data to an SD cards. The FRLogger uses a generic sensor class, FRFRSensor. For the usage of FRFRSensor, see next section.
+The Logger class creates a handler for logging data to an SD cards. The FRLogger uses a generic sensor class, FRFRSensor. For the usage of FRSensor, see next section.
 Methods:
 
-	#include <FRLogger.h>
 	Logger();
 	bool CheckSD();
 	void AddSensor(FRSensor* Sensor);
@@ -57,7 +48,6 @@ The FRSensor class is a parent class for the classes listed below. The Logger mo
 The FRAnalog class is a class for specifically logging analog inputs such as potmeter sensor. It is derived from the FRSensor class.
 Methods:
 
-	#include <FRAnalog>
 	FRAnalog();
 	FRAnalog(byte pinNumber);
 	FRAnalog(byte pinNumber, String headerString);
@@ -69,18 +59,18 @@ Methods:
 
 Usage:
 
+	#include <FRAnalog>
 	...
 	FRAnalog myAnalog1(PINAD, "AlphaVane[deg]"); // for the headerSting
 	...
 	myLogger.AddSensor(&myAnalog1);
 
-If SetOutputRange is not used, the logged value is 12 bit (0-4095)
+If SetOutputRange is not used, the logged value in SensorString is 12 bit (0-4095), else it will have a value within the predefined range
 If the header string is not set, it will be empty
 
 ## FRAS5600
-The FRAS5600 class is a class for logging the AS5600 hall sensor, used in the alpha vane.
+The FRAS5600 class is a class for logging the AS5600 hall sensor, used in the alpha vane. Internally it uses the libary AS5600.h
 	
-	#include <FRAS5600>
 	FRAS5600();
 	bool Init();
 	bool Init(float offsetAngle);
@@ -91,15 +81,18 @@ The FRAS5600 class is a class for logging the AS5600 hall sensor, used in the al
 
 Usage:
 
+	#include <FRAS5600>
 	FRAS5600 myAlphaVane;
 	...
 	FRAS5600.Init();
 	FRAS5600.AutoOffset();
 
 AutoOffset will set the current value to zero.
+The value logged in SensorString is angle [deg]	
+
 
 ## FRBMP280
-The FRBMP280 class is a class for logging the BMP280 pressure sensor.
+The FRBMP280 class is a class for logging the BMP280 pressure sensor. Internally it uses the library Adafruit_BMP280.h
 
 	FRBMP280();
 	~FRBMP280();
@@ -108,99 +101,129 @@ The FRBMP280 class is a class for logging the BMP280 pressure sensor.
 	float GetAltitude() //meter
 	void AutoOffset() 
 	void SetOffsetPressurehPa(float inPressure)
-	
+
+Note that the method Init expects the I2C communication to be running, using Wire.	
 The values logged in SensorString are pressure [pa], altitude [m], chip temperature [deg C]	
 
-## FRMPU6050Manager
-The MPU6050Manager class is a class for specifically logging an MPU6050 sensor. It is derived from the FRSensor class. Internally it uses the library Adafruit_MPU6050
+## FRMPU9250
+The FRMPU9250 class is a class for specifically logging the MPU9250 IMUsensor. It is derived from the FRSensor class.  
+The MPU9250 is a 10 DoF sensor: 3 axis accelerometer, 3 axis gyro, 3 axis magnetometer, temperature. 
+Internally it uses the library MPU9250.h by Bolder Flight Systems. For that you need to install the libraries Eigen.h and Units.h for Bolder Flight Systems as well.
 Methods:
 
-	#include <FRMPU6050Manager.h> 
-	MPU6050Manager();
-	bool Init(TwoWire &myWire, mpu6050_accel_range_t accelRange, mpu6050_gyro_range_t gyroRange)
+	FRMPU9250();
+	bool Init(TwoWire &myWire);
+
+	void SetOffsetAcc(float ax0, float ay0, float az0);
+	void AutoOffsetGyro();
+
+	float GetAx();
+	float GetAy();
+	float GetAz();
+	float GetGx();
+	float GetGy();
+	float GetGz();
+	float GetMx();
+	float GetMy();
+	float GetMz();
 
 Usage:
 
+	#include <FRMPU9250.h> 
 	...
-	MPU6050Manager myMPU;
+	FRMPU9250 myIMUSensor;
 	...
-	myMPU.Init(Wire, MPU6050_RANGE_4_G, MPU6050_RANGE_500_DEG);
-	myLogger.AddSensor(&myMPU);
+	myIMUSensor.Init(Wire);
+    myIMUSensor.AutoOffsetGyro();
+    myIMUSensor.SetOffsetAcc(0.0, 0.0, -9.81);
+	
+	myLogger.AddSensor(&myIMUSensor);
 
-Note that:
-- The method init expects the I2C communication to be running
-- The method init requires a range for the accelerometer and the gyro. The values are defined in the library Adafruit_MPU6050
+Note that the method Init expects the I2C communication to be running, using Wire.
+The values logged in SensorString are ax, ay, ax [m/s2], gx, gy, gz [rad/s], mx, my, mz [microT] chip temperature [deg C]	
 
-Examples:
-- FRLoggerDemo.ino
-
-## FRTinyGPSManager
-The TinyGPSManager class is a class for specifically logging an TinyGPSPlus sensor. It is derived from the FRSensor class. Internally it uses the library TinyGPSPlus
+## FRMS4525DO
+The FRMS4525DO class is a class for specifically logging a Ms4525do sensor (differential pressure). This is used in the pitot sensor. It is derived from the FRSensor class. Internally it uses the library ms4525do.h 
 Methods:
 
-	TinyGPSManager();
-	bool Init();
+	FRMS4525DO();
+	bool Init(TwoWire &myWire);
+
+	float GetPressure()
+	void AutoOffset()
+	float GetSpeed()
 	
 Usage:
 	
-	#include <FRTinyGPSManager.h>
-	TinyGPSManager myGPS; 
-	...
-	myGPS.Init();
-	myLogger.AddSensor(&myGPS);
-
-## FRMs4525doManager
-The Ms4525doManager class is a class for specifically logging a Ms4525do sensor (differential pressure). This is used in the pitot sensor. It is derived from the FRSensor class. Internally it uses the library ms4525do
-Methods:
-
-	Ms4525doManager();
-	Init();
-	
-	
-Usage:
-	
-	#include <FRTinyGPSManager.h>
-	Ms4525doManager myPitot; 
+	#include <FRMS4525DO.h>
+	FRMS4525DO myPitot; 
 	...
 	myPitot.Init();
+	myPitot.AutoOffset();
 	myLogger.AddSensor(&myPitot);
 	
-## PPMReceiverManager
-The PPMReceiverManager class is a class specifically for logging ppm signals. It is a variant on PPMReceiver, but based on the FRSensor class, using an interrupt routine.
+Note that the method Init expects the I2C communication to be running, using Wire. 
+The values logged in SensorString are deltaPressure [Pa], velocity [m/s], chip temperature [deg C]	
+	
+
+## FRTinyGPS
+The FRTinyGPS class is a class for specifically logging an TinyGPSPlus sensor. It is derived from the FRSensor class. Internally it uses the library TinyGPSPlus-ESP32.h
 Methods:
 
-	PPMReceiverManager(int pinNumber, int numberOfChannels)
+	FRTinyGPS();
+	bool Init();
+	bool Init(float lat0Deg, float lon0Deg);
+
+	void SetLat0( float lat0Deg );
+	void SetLon0( float lon0Deg );
+
+	float GetLatitude();
+	float GetLongitude();
+	float GetAltitude();
+	int GetSatellites();
+	float GetRelativeX();
+	float GetRelativeY();
+  
+	bool HasValidData();
+	
+Usage:
+	
+	#include <FRTinyGPS.h>
+	FRTinyGPS myGPSSensor; 
+	...
+	myGPSSensor.Init(LAT0, LON0);
+	myLogger.AddSensor(&myGPSSensor);
+	
+The class FRTinyGPS calculates the relative x and y position from a given origin coordinate (lat0Deg, lon0Deg). If not set, the default coordinate is used of the model flying club EMCR
+The values logged in SensorString are number of satellites found, date, time, latitude [deg], longitude [deg], relative x [m], relative y [m], altitude [m] 	
+
+
+## FRPPMReceiver
+The FRPPMReceiver class is a class specifically for logging ppm signals, based on the FRSensor class. It is an advanced version of the FRPPMReceiverSensor in FRLibBasics. 
+The extra methods allow for adding the channels to the logfile, and states of switches can be accessed easily
+Methods:
+
+	FRPPMReceiver(byte pinNumber, byte numberOfChannels);
+
 	void Init();
 	void SetPrefix(String prefix);
-    int ReadChannel(int ChannelNumber);
+
+	int ReadChannel(byte ChannelNumber);
+	bool IsChannelHigh(byte ChannelNumber);
+	triStateSwitch GetChannelTriState(byte ChannelNumber);
 
 Usage:
 
 	#include <FRPPMReceiverManager.h>
-	PPMReceiverManager MyReceiverManager(PINPPM, NUMBEROFCHANNELS);
+	FRPPMReceiver myReceiver(PINPPM, NUMBEROFCHANNELS);
 	...
-	MyReceiverManager.Init();
-	myLogger.AddSensor(&MyReceiverManager);
+	myReceiver.Init();
+	myLogger.AddSensor(&myReceiver);
 	...
-	MyReceiverManager.ReadChannel(i);
-
-Examples:
-- FRPPMReceiverManagerTest.ino	
+	myReceiver.ReadChannel(i);
+	...
+	binarySwitchState = myReceiver.IsChannelHigh(i);
+	...
+	tripleSwitchState = myReceiver.GetChannelTriState(i);
 	
-
-## Other examples
-**FRGPSTest.ino**
-
-Read the Serial2 port and prints the data to the Serial monitor. Useful for checking connection with GPS Sensor. This example does not decode the signal, it merely prints the raw data
-
-**FRMPU6050Test.ino**
-
-Sets up communication to the MPU6050 over I2C
-
-**FRServoAnalogReadTest.ino**
-
-Uses ESP32Servo library for controlling servo's with the analog input.
-
-**FRTimeDemo.ino**
-
-Demonstrates the uses of millis() and the duration of print statements.
+If the FRPPMReceiver object is added to the logger, the channels will be logged. With SetPrefix, the header prefix can be set: SetPrefix("switch") --> "switch1", "switch2" etc
