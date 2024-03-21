@@ -23,9 +23,6 @@ bool FRAS5600::Init(float offsetAngle){
 	return success;
 }
 
-void FRAS5600::SetOffsetAngle(float offsetAngle) {
-	_myAS5600->setOffset(-offsetAngle);
-}
 
 String FRAS5600::HeaderString(){
     String tempString;
