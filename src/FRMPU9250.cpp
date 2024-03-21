@@ -6,22 +6,38 @@
 #include "FRGeneric.h"
 
 FRMPU9250::FRMPU9250() {
-    _myMPUv2 = new bfs::Mpu9250();
+    _myMPU = new bfs::Mpu9250();
 }
 
 FRMPU9250::~FRMPU9250(){
-    delete _myMPUv2;
+    delete _myMPU;
 }
 
 bool FRMPU9250::Init(TwoWire &myWire) {
-    _myMPUv2->Config(&myWire, bfs::Mpu9250::I2C_ADDR_PRIM);
-    if (!_myMPUv2->Begin()) {
+    _myMPU->Config(&myWire, bfs::Mpu9250::I2C_ADDR_PRIM);
+    if (!_myMPU->Begin()) {
         // Serial.println("MPU9250 not found!");
         return false;
     } else {
         // Serial.println("MPU9250 found!");
+		_myMPU->Read();
         return true;
     }
+}
+
+void FRMPU9250::SetOffsetAcc(float ax, float ay, float az){
+	//Serial.println(SensorString());
+	//_ax0 = static_cast<double>(GetAx());// - ax;
+	_ay0 = GetAy() - ay;
+	_az0 = GetAz() - az;
+	Serial.print("Ax0:");
+	Serial.println(_ax0);
+}
+
+void FRMPU9250::AutoOffsetGyro(){
+	_gx0 = _myMPU->gyro_x_radps();
+	_gy0 = _myMPU->gyro_y_radps();
+	_gz0 = _myMPU->gyro_z_radps();
 }
 
 String FRMPU9250::HeaderString(){
@@ -41,22 +57,22 @@ String FRMPU9250::HeaderString(){
 }
 
 String FRMPU9250::SensorString() {
-    if (!_myMPUv2->Read()) {
+    if (!_myMPU->Read()) {
         return "";
     }
 
     String tempString;
     
-    tempString.concat(createFloatString(_myMPUv2->accel_x_mps2(), 3));
-    tempString.concat(createFloatString(_myMPUv2->accel_y_mps2(), 3));
-    tempString.concat(createFloatString(_myMPUv2->accel_z_mps2(), 3));
-    tempString.concat(createFloatString(_myMPUv2->gyro_x_radps(), 3));
-    tempString.concat(createFloatString(_myMPUv2->gyro_y_radps(), 3));
-    tempString.concat(createFloatString(_myMPUv2->gyro_z_radps(), 3));
-    tempString.concat(createFloatString(_myMPUv2->mag_x_ut(), 3));
-    tempString.concat(createFloatString(_myMPUv2->mag_y_ut(), 3));
-    tempString.concat(createFloatString(_myMPUv2->mag_z_ut(), 3));
-    tempString.concat(createFloatString(_myMPUv2->die_temp_c(), 1));
+    tempString.concat(createFloatString(GetAx(), 3));
+    tempString.concat(createFloatString(GetAy(), 3));
+    tempString.concat(createFloatString(GetAz(), 3));
+    tempString.concat(createFloatString(_myMPU->gyro_x_radps(), 3));
+    tempString.concat(createFloatString(_myMPU->gyro_y_radps(), 3));
+    tempString.concat(createFloatString(_myMPU->gyro_z_radps(), 3));
+    tempString.concat(createFloatString(_myMPU->mag_x_ut(), 3));
+    tempString.concat(createFloatString(_myMPU->mag_y_ut(), 3));
+    tempString.concat(createFloatString(_myMPU->mag_z_ut(), 3));
+    tempString.concat(createFloatString(_myMPU->die_temp_c(), 1));
     
     return tempString;
 }
