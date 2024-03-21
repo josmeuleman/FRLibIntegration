@@ -27,12 +27,10 @@
 // Other libraries
 #include <ESP32Servo.h>
 
-
 const byte NUMBEROFSERVOS = 2;       // Number of servos 
 const byte NUMBEROFCHANNELS = 8;     // Number of Channels of myReceiver
 
 // Pins
-const byte PINSWITCH = 35;           // The pin number for he button to start and stop logging
 const byte PINSERVO[NUMBEROFSERVOS] = {25, 26}; // Servo Channels
 const byte PINPPM = 4;               // PM2 input pint
 
@@ -41,16 +39,14 @@ const int  LOOPTIMESERVOMS = 100;     // Loop time for controlling servos
 
 
 // Create all objects
-Timer servoTimer(LOOPTIMESERVOMS);  // Timer object for the clock
+Timer myServoTimer(LOOPTIMESERVOMS);// Timer object for the clock
 Servo myServo[NUMBEROFSERVOS];      // create a servo object
-Button myButton(PINSWITCH, true);   // Create a button object with the given pin. True for an inverted button, false for a normal button
 RGBLED myLed;                       // Create a RGB led object. pinnummbers are defined in the library FRRGBLED.h.
 FRPPMReceiver myReceiver(PINPPM, NUMBEROFCHANNELS);  // Create a PPM receiver object with given pin and number of channels
 
 int channelValues[NUMBEROFCHANNELS];
 const byte LOGGERSWITCHCHANNEL = 4;
 const byte LANDINGGEARCHANNEL = 5;
-
 
 // States for starting and stopping the logger
 bool loggerSwitchState = HIGH;
@@ -62,17 +58,16 @@ bool stopLogger = false;
 triStateSwitch landingGearSwitchState;
 triStateSwitch landingGearSwitchStatePrev;
 
-
+// Servo parameters: number, max speed, max values;
 const byte SERVOLANDINGGEAR = 0;        // the servo number of the landing gear
 const byte SERVOLANDINGHATCH = 1;   // the servo number of the landing gear hatch
 const int MAXSERVOSPEEDDEGS[NUMBEROFSERVOS] = {30, 30}; // Maximum speed of the servos in degrees per sec
-int servoTargetPos[NUMBEROFSERVOS] = {0, 0}; //The initial state of the servos
+int servoTargetPos[NUMBEROFSERVOS]; 
 float servoActualPos[NUMBEROFSERVOS];
 const int SERVOLANDINGGEARPOSEXTENDED = 130;
 const int SERVOLANDINGGEARPOSRETRACTED = 13;
 const int SERVOLANDINGHATCHPOSOPEN = 27;
 const int SERVOLANDINGHATCHPOSCLOSED = 176;
-
 
 
 //---------------------------------------------------------------------------------------------------------
@@ -96,7 +91,9 @@ void setup() {
     servoActualPos[i] = servoTargetPos[i];
   }
   
-  servoTimer.Start();
+  myServoTimer.Start();
+  Serial.println("End of Setup");
+  myLed.SetColor(GREEN);  
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -159,7 +156,7 @@ void loop() {
   // End of the loop
   //-------------------------------------------------------------------------------------------------------
   // Kill the time until
-  if (servoTimer.WaitUntilEnd()) {
+  if (myServoTimer.WaitUntilEnd()) {
     Serial.println("Overrun!");
   }
 }
@@ -224,7 +221,5 @@ void UpdateServos(){
 
     // Write the rounded off setpoint to the servo motor
     myServo[i].write(int(servoActualPos[i]));
-    
   }
-
 }
