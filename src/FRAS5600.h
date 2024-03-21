@@ -17,7 +17,7 @@ class FRAS5600 : public FRSensor {
 		bool Init(float offsetAngle);
 		
 		float GetAngle() { return _myAS5600->readAngle()*AS5600_RAW_TO_DEGREES; }
-		void SetOffsetAngle (float offsetAngle);
+		void SetOffsetAngle (float offsetAngle) {_myAS5600->setOffset(-offsetAngle); }
 		void AutoOffset() {_myAS5600->setOffset(-GetAngle()); }
 		
 		
