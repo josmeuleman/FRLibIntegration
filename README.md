@@ -10,6 +10,7 @@ Dependencies:
   - FRLED.h
   - FRRGBLED.h
   - FRTimer.h
+- AS5600.h for angular sensor (angle of attack)
 - ESP32Servo.h 
 - SSD1306Ascii.h for OLED
 - SSD1306AsciiWire.h for OLED
@@ -47,6 +48,7 @@ Examples:
 
 ## FRSensor
 The FRSensor class is a parent class for the classes listed below. The Logger monitors objects of the class FRSensor. In the child-classes of FRSensor, the following methods are implemented
+
 	String HeaderString() ; // for the top row of the log file
 	String SensorString() ; // for the data row of the log file
 
@@ -54,7 +56,7 @@ The FRSensor class is a parent class for the classes listed below. The Logger mo
 The FRAnalog class is a class for specifically logging analog inputs such as potmeter sensor. It is derived from the FRSensor class.
 Methods:
 
-	#include<FRFRAnalog>
+	#include <FRAnalog>
 	FRAnalog();
 	FRAnalog(byte pinNumber);
 	FRAnalog(byte pinNumber, String headerString);
@@ -74,6 +76,28 @@ Usage:
 
 If SetOutputRange is not used, the logged value is 12 bit (0-4095)
 If the header string is not set, it will be empty
+
+## FRAS5600
+The FRAS5600 class is a class for logging the AS5600 hall sensor, used in the alpha vane
+	
+	#include <FRAS5600>
+	FRAS5600();
+	~FRAS5600();
+	bool Init();
+	bool Init(float offsetAngle);
+	
+	float GetAngle();
+	void SetOffsetAngle;
+	void AutoOffset();
+
+Usage:
+
+	FRAS5600 myAlphaVane;
+	...
+	FRAS5600.Init();
+	FRAS5600.AutoOffset();
+
+AutoOffset will set the current value to zero.
 
 ## FRMPU6050Manager
 The MPU6050Manager class is a class for specifically logging an MPU6050 sensor. It is derived from the FRSensor class. Internally it uses the library Adafruit_MPU6050
