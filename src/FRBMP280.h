@@ -1,6 +1,6 @@
 // Wrapper for a BMP280 sensor. It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
-// 2024-03-07, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2024-03-21, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
 
 #ifndef FRBMP280_h
 #define FRBMP280_h
@@ -14,8 +14,11 @@ class FRBMP280 : public FRSensor {
         FRBMP280();
         ~FRBMP280();
         bool Init(TwoWire &myWire);
-		void AutoOffset();
-		void SetOffsetPressurehPa(float inPressure);
+		long GetPressure() { return _myBMP->readPressure(); }
+		float GetAltitude() { return _myBMP->readAltitude(_offsetPressure); }
+		void AutoOffset() { _offsetPressure = _myBMP->readPressure()/100; }
+		void SetOffsetPressurehPa(float inPressure) { _offsetPressure = inPressure; }
+		
         String HeaderString() override;
         String SensorString() override;
 
