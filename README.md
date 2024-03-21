@@ -2,6 +2,7 @@
 Integration FlightRecorder Library for Arduino IDE. This library contains sublibraries and examples for making a flight recorder for an ESP32.
 The library is written for the Project2.2 for Aeronautical & Precision Engineerring at Inholland, Delft.
 The library is updated for Flight Recorder Board V2
+
 Dependencies:
 - FRLibBasics
   - FRGeneric.h
@@ -27,13 +28,13 @@ Methods:
 
 
 ## FRLogger
-The Logger class creates a handler for logging data to an SD cards. The FRLogger uses a generic sensor class, FRSensorManager. For the usage of FRSensorManager, see next section.
+The Logger class creates a handler for logging data to an SD cards. The FRLogger uses a generic sensor class, FRFRSensor. For the usage of FRFRSensor, see next section.
 Methods:
 
 	#include <FRLogger.h>
 	Logger();
 	bool CheckSD();
-	void AddSensor(SensorManager* Sensor);
+	void AddSensor(FRSensor* Sensor);
 	String GetLoggerFileName();
 	bool IsLogging();
 	bool StartLogger();
@@ -45,32 +46,37 @@ Examples:
 - FRLoggerDemo.ino
 
 ## FRSensor
-The FRSensor class is a parent class for the classes listed below. The Logger monitors objects of the class FRSensor. In the child-classes of FRSensor, the methods are implemented
+The FRSensor class is a parent class for the classes listed below. The Logger monitors objects of the class FRSensor. In the child-classes of FRSensor, the following methods are implemented
+	String HeaderString() ; // for the top row of the log file
+	String SensorString() ; // for the data row of the log file
 
-## FRAnalogInputManager
-The AnalogInputManager class is a class for specifically logging analog inputs such as potmeter sensor. It is derived from the SensorManager class.
+## FRAnalog
+The FRAnalog class is a class for specifically logging analog inputs such as potmeter sensor. It is derived from the FRSensor class.
 Methods:
 
-	#include<FRAnalogInputManager>
-	AnalogInputManager();
-	AnalogInputManager(int pinNumber);
-	AnalogInputManager(int pinNumber, String headerString);
-	void SetPinNumber(int pinNumber);
+	#include<FRFRAnalog>
+	FRAnalog();
+	FRAnalog(byte pinNumber);
+	FRAnalog(byte pinNumber, String headerString);
+	~FRAnalog();
+
+	void SetPinNumber(byte pinNumber);
 	void SetHeaderString(String headerString);
 	void SetOutputRange(float minValue, float maxValue);
+	float GetValue() ;
 
 Usage:
 
 	...
-	AnalogInputManager myAnalog1(PINAD, "AlphaVane[deg]");
+	FRAnalog myAnalog1(PINAD, "AlphaVane[deg]"); // for the headerSting
 	...
 	myLogger.AddSensor(&myAnalog1);
 
-Examples:
-- FRLoggerDemo.ino
+If SetOutputRange is not used, the logged value is 12 bit (0-4095)
+If the header string is not set, it will be empty
 
 ## FRMPU6050Manager
-The MPU6050Manager class is a class for specifically logging an MPU6050 sensor. It is derived from the SensorManager class. Internally it uses the library Adafruit_MPU6050
+The MPU6050Manager class is a class for specifically logging an MPU6050 sensor. It is derived from the FRSensor class. Internally it uses the library Adafruit_MPU6050
 Methods:
 
 	#include <FRMPU6050Manager.h> 
@@ -93,7 +99,7 @@ Examples:
 - FRLoggerDemo.ino
 
 ## FRTinyGPSManager
-The TinyGPSManager class is a class for specifically logging an TinyGPSPlus sensor. It is derived from the SensorManager class. Internally it uses the library TinyGPSPlus
+The TinyGPSManager class is a class for specifically logging an TinyGPSPlus sensor. It is derived from the FRSensor class. Internally it uses the library TinyGPSPlus
 Methods:
 
 	TinyGPSManager();
@@ -108,7 +114,7 @@ Usage:
 	myLogger.AddSensor(&myGPS);
 
 ## FRMs4525doManager
-The Ms4525doManager class is a class for specifically logging a Ms4525do sensor (differential pressure). This is used in the pitot sensor. It is derived from the SensorManager class. Internally it uses the library ms4525do
+The Ms4525doManager class is a class for specifically logging a Ms4525do sensor (differential pressure). This is used in the pitot sensor. It is derived from the FRSensor class. Internally it uses the library ms4525do
 Methods:
 
 	Ms4525doManager();
@@ -124,7 +130,7 @@ Usage:
 	myLogger.AddSensor(&myPitot);
 	
 ## PPMReceiverManager
-The PPMReceiverManager class is a class specifically for logging ppm signals. It is a variant on PPMReceiver, but based on the SensorManager class, using an interrupt routine.
+The PPMReceiverManager class is a class specifically for logging ppm signals. It is a variant on PPMReceiver, but based on the FRSensor class, using an interrupt routine.
 Methods:
 
 	PPMReceiverManager(int pinNumber, int numberOfChannels)
