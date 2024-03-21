@@ -43,9 +43,9 @@ String FRMPU9250::HeaderString(){
   tempString.concat("accX [m/s2]; ");
   tempString.concat("accY [m/s2]; ");
   tempString.concat("accZ [m/s2]; ");
-  tempString.concat("rotX [deg/s]; ");
-  tempString.concat("rotY [deg/s]; ");
-  tempString.concat("rotZ [deg/s]; ");
+  tempString.concat("rotX [rad/s]; ");
+  tempString.concat("rotY [rad/s]; ");
+  tempString.concat("rotZ [rad/s]; ");
   tempString.concat("magX [uT]; ");
   tempString.concat("magY [uT]; ");
   tempString.concat("magZ [uT]; ");
