@@ -35,7 +35,7 @@ const byte PINSERVO[NUMBEROFSERVOS] = {25, 26}; // Servo Channels
 const byte PINPPM = 4;               // PM2 input pint
 
 // other constants
-const int  LOOPTIMESERVOMS = 100;     // Loop time for controlling servos
+const int  LOOPTIMESERVOMS = 10;     // Loop time for controlling servos
 
 
 // Create all objects
@@ -165,15 +165,22 @@ void loop() {
 // FUNCTIONS
 // Here the custom functions are defined
 //---------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------------------------------------
+// Function that prints an error to the serial port and makes the RGBLED red
+//---------------------------------------------------------------------------------------------------------
 void Error(String errorMessage) {
   Serial.println(errorMessage);
   myLed.SetColor(RED);
 }
 
+//---------------------------------------------------------------------------------------------------------
+// Function that controls the leading gear and hatch, based on the switch state
+//---------------------------------------------------------------------------------------------------------
 
 void HandleLandingGearSwitch(){
   // landingGearSwitchState can have the state LOSTATE (-1), MIDSTATE (0), or HISTATE (1)
-  // the functin GetChannelTriState returns one of these three states depending on the value of the channel
+  // the function GetChannelTriState returns one of these three states depending on the value of the channel
   landingGearSwitchState = myReceiver.GetChannelTriState(LANDINGGEARCHANNEL);
 
   if (landingGearSwitchState < landingGearSwitchStatePrev) {
@@ -204,6 +211,9 @@ void HandleLandingGearSwitch(){
 
 }
 
+//---------------------------------------------------------------------------------------------------------
+// Function that controls the servos to their setpoints with limited speed
+//---------------------------------------------------------------------------------------------------------
 void UpdateServos(){
   for (int i = 0; i < NUMBEROFSERVOS; i++) {
     // Calculate the differrence between target and current position
