@@ -18,6 +18,22 @@ bool FRTinyGPS::Init(){
   return true;
 }
 
+bool FRTinyGPS::Init(float lat0Deg, float lon0Deg){
+  Serial2.begin(_BAUDGPS);
+  SetLat0(lat0Deg);
+  SetLon0(lon0Deg);
+  return true;
+}
+
+void FRTinyGPS::SetLat0( float lat0Deg ){
+	_lat0Deg = lat0Deg;
+	_cosLat0 = cos( _DEG2RAD * _lat0Deg);
+}
+
+void FRTinyGPS::SetLon0( float lon0Deg ){
+	_lon0Deg = lon0Deg;
+}
+
 bool FRTinyGPS::HasValidData() {
   return(_myGPS->location.isValid());
 }
@@ -29,7 +45,10 @@ String FRTinyGPS::HeaderString(){
   tempString.concat("Time [hh:mm:ss]; ");
   tempString.concat("Latitude [deg]; ");
   tempString.concat("Longitude [deg]; ");
+  tempString.concat("Relative X [m]; ");
+  tempString.concat("Relative Y [m]; ");
   tempString.concat("Altitude [m]; ");
+  
   return tempString;
 }
 
@@ -38,9 +57,8 @@ String FRTinyGPS::SensorString(){
   while ((Serial2.available() > 0) & (millis()-tStart < _TIMEOUTMS)){
     _myGPS->encode(Serial2.read());
   }	
-
   String tempString;
-  tempString.concat(createIntString(_myGPS->satellites.value()));
+  tempString.concat(createIntString(GetSatellites()));
   if (_myGPS->date.isValid()) {
 	tempString.concat(createDateString(_myGPS->date.year(), _myGPS->date.month(), _myGPS->date.day()));
   }
@@ -56,18 +74,23 @@ String FRTinyGPS::SensorString(){
   }
   
   if (_myGPS->location.isValid()) {
-	tempString.concat(createFloatString(_myGPS->location.lat(), 6));
-	tempString.concat(createFloatString(_myGPS->location.lng(), 6));
+	tempString.concat(createFloatString(GetLatitude(), 6));
+	tempString.concat(createFloatString(GetLongitude(), 6));
+	tempString.concat(createFloatString(GetRelativeX(), 6));
+	tempString.concat(createFloatString(GetRelativeY(), 6));
   }
   else {
     tempString.concat(createFloatString(0, 6));
 	tempString.concat(createFloatString(0, 6));  
+    tempString.concat(createFloatString(0, 6));
+	tempString.concat(createFloatString(0, 6));  
   }	  
   if (_myGPS->altitude.isValid()) {
-	tempString.concat(createFloatString(_myGPS->altitude.meters(), 1));
+	tempString.concat(createFloatString(GetAltitude(), 1));
   }
   else {
  	tempString.concat(createFloatString(0, 1));
   }
+
   return tempString;
 }
