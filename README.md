@@ -2,7 +2,6 @@
 Integration FlightRecorder Library for Arduino IDE. This library contains sublibraries and examples for making a flight recorder for an ESP32.
 The library is written for the Project2.2 for Aeronautical & Precision Engineerring at Inholland, Delft.
 The library is updated for Flight Recorder Board V2
-
 Dependencies:
 - FRLibBasics
   - FRGeneric.h
