@@ -11,6 +11,7 @@ Dependencies:
   - FRRGBLED.h
   - FRTimer.h
 - AS5600.h for angular sensor (angle of attack)
+- Adafruit_BMP280.h for pressure sensor (altitude)
 - ESP32Servo.h 
 - SSD1306Ascii.h for OLED
 - SSD1306AsciiWire.h for OLED
@@ -60,8 +61,7 @@ Methods:
 	FRAnalog();
 	FRAnalog(byte pinNumber);
 	FRAnalog(byte pinNumber, String headerString);
-	~FRAnalog();
-
+	
 	void SetPinNumber(byte pinNumber);
 	void SetHeaderString(String headerString);
 	void SetOutputRange(float minValue, float maxValue);
@@ -78,11 +78,10 @@ If SetOutputRange is not used, the logged value is 12 bit (0-4095)
 If the header string is not set, it will be empty
 
 ## FRAS5600
-The FRAS5600 class is a class for logging the AS5600 hall sensor, used in the alpha vane
+The FRAS5600 class is a class for logging the AS5600 hall sensor, used in the alpha vane.
 	
 	#include <FRAS5600>
 	FRAS5600();
-	~FRAS5600();
 	bool Init();
 	bool Init(float offsetAngle);
 	
@@ -98,6 +97,19 @@ Usage:
 	FRAS5600.AutoOffset();
 
 AutoOffset will set the current value to zero.
+
+## FRBMP280
+The FRBMP280 class is a class for logging the BMP280 pressure sensor.
+
+	FRBMP280();
+	~FRBMP280();
+	bool Init(TwoWire &myWire);
+	long GetPressure() //Pascal
+	float GetAltitude() //meter
+	void AutoOffset() 
+	void SetOffsetPressurehPa(float inPressure)
+	
+The values logged in SensorString are pressure [pa], altitude [m], chip temperature [deg C]	
 
 ## FRMPU6050Manager
 The MPU6050Manager class is a class for specifically logging an MPU6050 sensor. It is derived from the FRSensor class. Internally it uses the library Adafruit_MPU6050
