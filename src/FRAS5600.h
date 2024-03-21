@@ -15,10 +15,11 @@ class FRAS5600 : public FRSensor {
 		~FRAS5600();
 		bool Init();
 		bool Init(float offsetAngle);
-		void SetOffsetAngle(float offsetAngle);
-		void AutoOffset();
 		
-		float GetAngle();
+		float GetAngle() { return _myAS5600->readAngle()*AS5600_RAW_TO_DEGREES; }
+		void SetOffsetAngle (float offsetAngle);
+		void AutoOffset() {_myAS5600->setOffset(-GetAngle()); }
+		
 		
 		String HeaderString() override;
 		String SensorString() override;
