@@ -1,6 +1,6 @@
 // Wrapper for a MPU9250 sensor. It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
-// 2024-03-07, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2024-03-21, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
 
 #include "FRMPU9250.h"
 #include "FRGeneric.h"
@@ -26,12 +26,9 @@ bool FRMPU9250::Init(TwoWire &myWire) {
 }
 
 void FRMPU9250::SetOffsetAcc(float ax, float ay, float az){
-	//Serial.println(SensorString());
-	//_ax0 = static_cast<double>(GetAx());// - ax;
+	_ax0 = GetAx() - ax;
 	_ay0 = GetAy() - ay;
 	_az0 = GetAz() - az;
-	Serial.print("Ax0:");
-	Serial.println(_ax0);
 }
 
 void FRMPU9250::AutoOffsetGyro(){
