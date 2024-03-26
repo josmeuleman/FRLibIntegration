@@ -46,10 +46,6 @@ bool Logger::StartLogger() {
   }
   
   // Successfully opened a logfile. Write the header line
-
-  //for (int i = 0; i < sensors.size(); i++) {
-  //  _headerString.concat(sensors[i]->HeaderString());
-  //}
   _file.println(_headerString);
 
   _isLogging = true;
