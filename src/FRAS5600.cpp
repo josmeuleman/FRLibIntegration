@@ -26,7 +26,7 @@ bool FRAS5600::Init(float offsetAngle){
 
 String FRAS5600::HeaderString(){
     String tempString;
-    tempString.concat("Angle; ");
+    tempString.concat("Angle [deg]; ");
     return tempString;
 }
 
