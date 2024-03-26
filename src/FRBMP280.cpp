@@ -22,9 +22,9 @@ bool FRBMP280::Init(TwoWire &myWire){
 
 String FRBMP280::HeaderString(){
     String tempString;
-    tempString.concat("Pressure; ");
-    tempString.concat("Approx altitude; ");
-    tempString.concat("Temperature; ");
+    tempString.concat("Pressure [Pa]; ");
+    tempString.concat("Approx altitude [m]; ");
+    tempString.concat("Temperature [degC]; ");
     return tempString;
 }
 
