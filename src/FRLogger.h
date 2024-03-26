@@ -46,6 +46,7 @@ class Logger{
   String _loggerString;
   String _headerString;
   
+  
 };
 
 
