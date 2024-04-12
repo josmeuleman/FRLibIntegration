@@ -9,6 +9,8 @@ Logger::Logger() {
   _isLogging = false;
   _fileName = "";
   _loggerString.reserve(512);
+  _headerString.clear();
+  _headerString.concat("Time[ms]; ");  
 }
 
 bool Logger::CheckSD() {
@@ -17,6 +19,7 @@ bool Logger::CheckSD() {
 
 void Logger::AddSensor(FRSensor *Sensor){
   sensors.push_back(Sensor);
+  _headerString.concat(Sensor->HeaderString());
 }
 
 String Logger::GetLoggerFileName() {
@@ -41,13 +44,7 @@ bool Logger::StartLogger() {
   if (!_file) {  //Failed to open the file
     return false;
   }
-  
-  // Successfully opened a logfile. Write the header line
-  _headerString.clear();
-  _headerString.concat("Time[ms]; ");
-  for (int i = 0; i < sensors.size(); i++) {
-    _headerString.concat(sensors[i]->HeaderString());
-  }
+
   _file.println(_headerString);
 
   _isLogging = true;
