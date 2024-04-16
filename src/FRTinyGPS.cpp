@@ -14,12 +14,12 @@ FRTinyGPS::~FRTinyGPS(){
 }
 
 bool FRTinyGPS::Init(){
-  Serial2.begin(_BAUDGPS);
+  Serial2.begin(_BAUDGPS, SERIAL_8N1, _RX, _TX);
   return true;
 }
 
 bool FRTinyGPS::Init(float lat0Deg, float lon0Deg){
-  Serial2.begin(_BAUDGPS);
+  Serial2.begin(_BAUDGPS, SERIAL_8N1, _RX, _TX);
   SetLat0(lat0Deg);
   SetLon0(lon0Deg);
   return true;
