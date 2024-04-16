@@ -11,6 +11,7 @@ Logger::Logger() {
   _loggerString.reserve(512);
   _headerString.clear();
   _headerString.concat("Time[ms]; "); 
+
 }
 
 bool Logger::CheckSD() {
