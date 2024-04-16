@@ -32,6 +32,8 @@ class FRTinyGPS : public FRSensor {
 
   private :
   const int _BAUDGPS = 9600;
+  const byte _TX = 17;
+  const byte _RX = 16;
   const int _TIMEOUTMS = 20;
   TinyGPSPlus* _myGPS;
   const long _RADIUSEARTHM = 6378100; // Average Radius Earth
