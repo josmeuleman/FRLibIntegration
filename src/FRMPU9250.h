@@ -7,6 +7,7 @@
 
 #include <FRSensor.h>
 #include <mpu9250.h>
+#include <MahonyAHRS.h>
 #include <Wire.h>
 
 class FRMPU9250 : public FRSensor {
@@ -14,7 +15,8 @@ class FRMPU9250 : public FRSensor {
 		FRMPU9250();
 		~FRMPU9250();
 		bool Init(TwoWire &myWire);
-
+		
+		void SetSampleFrequency(int SF) { _sampleFrequencyHz = SF; }
 		void SetOffsetAcc(float ax0, float ay0, float az0);
 		void AutoOffsetGyro();
 
@@ -29,12 +31,17 @@ class FRMPU9250 : public FRSensor {
 		float GetMx() { return _myMPU->mag_x_ut(); }
 		float GetMy() { return _myMPU->mag_y_ut(); }
 		float GetMz() { return _myMPU->mag_z_ut(); }
-
+		
+		float GetRoll() { return _myFilter->getRoll(); }
+		float GetPitch() { return _myFilter->getPitch(); }
+		float GetHeading() { return _myFilter->getYaw(); }
+		
 		String HeaderString() override;
 		String SensorString() override;
 
     private :
 		bfs::Mpu9250* _myMPU;
+		Mahony* _myFilter;
 		const int MPU9250_ADDRESS = 0x68;
 		float _ax0 = 0.0;
 		float _ay0 = 0.0;
@@ -42,6 +49,7 @@ class FRMPU9250 : public FRSensor {
 		float _gx0 = 0.0;
 		float _gy0 = 0.0;
 		float _gz0 = 0.0;
+		float _sampleFrequencyHz = 10.0; 
 	
 };
 
