@@ -32,6 +32,6 @@ String FRBMP280::SensorString(){
     String tempString;
     tempString.concat( createFloatString( GetPressure(), 0) );
     tempString.concat( createFloatString( GetAltitude(), 2) ); // Adjust for local pressure!!
-    tempString.concat( createFloatString( _myBMP->readTemperature(), 2) );
+    tempString.concat( createFloatString( _myBMP->readTemperature(), 1) );
     return tempString;
 }
