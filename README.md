@@ -4,7 +4,7 @@ The library is written for the Project2.2 for Aeronautical & Precision Engineerr
 The library is updated for Flight Recorder Board V2
 
 Dependencies:
-- FRLibBasics
+- FRLibBasics including: 
   - FRGeneric.h
   - FRButton.h
   - FRLED.h
@@ -12,12 +12,13 @@ Dependencies:
   - FRTimer.h
 - AS5600.h by Rob Tillaart for angular sensor (angle of attack)
 - Adafruit_BMP280.h for pressure sensor (altitude)
-- ESP32Servo.h
+- ESP32Servo.h for servo control
 - MPU9250.h by Bolder Flight Systems for the IMU. Dependencies:
   - Eigen.h by Bolder Flight Systems
   - Units.h by Bolder Flight Systems
-- ms4525do.h by Bolder Flight Systems  
-- TinyGPSPlus-ESP32.h by Mikal Hart  
+- Mahony by Arduino for Attitude Heading and Reference calculation on IMU signals
+- ms4525do.h by Bolder Flight Systems for the pitot sensor
+- TinyGPSPlus-ESP32.h by Mikal Hart for the GPS reading and processing
 - SSD1306Ascii.h for OLED
 - SSD1306AsciiWire.h for OLED
 
@@ -108,7 +109,8 @@ The values logged in SensorString are pressure [pa], altitude [m], chip temperat
 ## FRMPU9250
 The FRMPU9250 class is a class for specifically logging the MPU9250 IMUsensor. It is derived from the FRSensor class.  
 The MPU9250 is a 10 DoF sensor: 3 axis accelerometer, 3 axis gyro, 3 axis magnetometer, temperature. 
-Internally it uses the library MPU9250.h by Bolder Flight Systems. For that you need to install the libraries Eigen.h and Units.h for Bolder Flight Systems as well.
+Internally it uses the library MPU9250.h by Bolder Flight Systems. For that you need to install the libraries Eigen.h and Units.h by Bolder Flight Systems as well.
+It calculates the roll, pitch and yaw (heading) from the IMU, using MahonyAHRS.h. For that you need to install the Mahony library by Arduino
 Methods:
 
 	FRMPU9250();
@@ -126,6 +128,10 @@ Methods:
 	float GetMx();
 	float GetMy();
 	float GetMz();
+	float GetRoll();
+	float GetPitch();
+	float GetHeading();
+	
 
 Usage:
 
@@ -227,3 +233,9 @@ Usage:
 	tripleSwitchState = myReceiver.GetChannelTriState(i);
 	
 If the FRPPMReceiver object is added to the logger, the channels will be logged. With SetPrefix, the header prefix can be set: SetPrefix("switch") --> "switch1", "switch2" etc
+
+## Other examples
+
+**FRLoggerServoIntegrationTemplate**
+
+Template for integrating two jobs that run at different frequency. In the template the logger functions get called at 10 Hz. The servo (and other) functions are colled in the main loop, running at 100 Hz. 
