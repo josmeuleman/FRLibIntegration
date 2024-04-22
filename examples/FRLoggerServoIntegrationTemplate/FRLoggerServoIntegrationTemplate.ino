@@ -2,7 +2,7 @@
 // In this script the servo loop runs at a faster rate than the logger loop
 // both run at the same time 
 // Required hardware:
-// - 1x Flight Recorder Board with ESP32
+// - 1x ESP32
 // Connections:
 
 // Required libraries:
