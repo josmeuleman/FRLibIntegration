@@ -50,7 +50,6 @@ class FRPPMReceiver : public FRSensor{
 
 		void CountPulse();
 		static void ppm_isr(void* arg);  
-  
 
 };
 
