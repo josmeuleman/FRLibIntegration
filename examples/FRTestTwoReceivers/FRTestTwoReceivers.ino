@@ -97,7 +97,7 @@ void loop() {
   }
   Serial.println();
 
-  myOLED.setRow(0);
+  myOLED.clear();  //clear display
   myOLED.println(channelsValues1[0]);
   myOLED.println(channelsValues2[0]);
 
