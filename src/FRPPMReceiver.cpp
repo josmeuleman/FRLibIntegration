@@ -8,10 +8,10 @@
 
 FRPPMReceiver* FRPPMReceiver::_instance = nullptr;
 
-volatile unsigned long FRPPMReceiver::_lastPulseUS;
+/*volatile unsigned long FRPPMReceiver::_lastPulseUS;
 volatile uint16_t FRPPMReceiver::_channel;
 volatile int* FRPPMReceiver::_channelValues;
-
+*/
 FRPPMReceiver::FRPPMReceiver(byte pinNumber, byte numberOfChannels) {
   _instance = this; // Store a pointer to this instance
   _numberOfChannels = numberOfChannels;
