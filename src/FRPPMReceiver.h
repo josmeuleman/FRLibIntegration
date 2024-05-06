@@ -38,9 +38,9 @@ class FRPPMReceiver : public FRSensor{
 	private:
 		byte _pinNumber;
 		byte _numberOfChannels;
-		static volatile unsigned long _lastPulseUS;
-		static volatile uint16_t _channel;
-		static volatile int* _channelValues;
+		volatile unsigned long _lastPulseUS;
+		volatile uint16_t _channel;
+		volatile int* _channelValues;
 
 		static FRPPMReceiver* _instance;
 		const int _MAXPULSEWIDTH = 1800;
