@@ -16,9 +16,11 @@
 //
 // 2024-03-21, Jos Meuleman, Inholland Aeronautical & Precision Engineering, The Netherlands
 
-// these are local files that contain big chunks of code to make the main document more readable. 
+// These are local files that contain big chunks of code to make the main document more readable. 
 // Check the corresponding files in the tab
 #include "init.h"
+#include "customfunctions.h"
+#include "smoothservo.h"
 
 
 //---------------------------------------------------------------------------------------------------------
@@ -30,18 +32,13 @@ void setup() {
   Serial.begin(9600);  // Start the serial communciation
     
   myReceiver.Init();
+  Serial.println(NUMBEROFSERVOS);
 
   for (int i=0; i<NUMBEROFSERVOS; i++) {
-    myServo[i].attach(PINSERVO[i]);
+    float maxStep = MAXSERVOSPEEDDEGS[i]*LOOPTIMESERVOMS/1000.0;
+    myServo[i].Init(PINSERVO[i], maxStep, SERVOSTARTPOS[i], SERVOENDPOS[i]);
   }
 
-  // Starting pos for servos. Make sure they are in the right positin
-  servoTargetPos[SERVOLANDINGGEAR] = SERVOLANDINGGEARPOSEXTENDED;
-  servoTargetPos[SERVOLANDINGHATCH] = SERVOLANDINGHATCHPOSOPEN;
-  for (int i = 0; i < NUMBEROFSERVOS; i++) {
-    servoActualPos[i] = servoTargetPos[i];
-  }
-  
   myServoTimer.Start();
   Serial.println("End of Setup");
   myLed.SetColor(GREEN);  
@@ -138,11 +135,11 @@ void HandleLandingGearSwitch(){
     // towards rectracted state
     if (landingGearSwitchState == MIDSTATE) {
       // So it was HISTATE, now pull in the gear
-      servoTargetPos[SERVOLANDINGGEAR] = SERVOLANDINGGEARPOSRETRACTED;
+      //servoTargetPos[SERVOLANDINGGEAR] = SERVOLANDINGGEARPOSRETRACTED;
       Serial.println("Retract gear");
     } else {
       // So it was in MIDSTATE, now close the hatch
-      servoTargetPos[SERVOLANDINGHATCH] = SERVOLANDINGHATCHPOSCLOSED;
+      //servoTargetPos[SERVOLANDINGHATCH] = SERVOLANDINGHATCHPOSCLOSED;
       Serial.println("Close hatch");
     }
   }
@@ -150,11 +147,11 @@ void HandleLandingGearSwitch(){
     // towards extended state
     if (landingGearSwitchState == MIDSTATE) {
       // So it was LOSTATE, now open the hatch
-      servoTargetPos[SERVOLANDINGHATCH] = SERVOLANDINGHATCHPOSOPEN;
+      //servoTargetPos[SERVOLANDINGHATCH] = SERVOLANDINGHATCHPOSOPEN;
       Serial.println("Open hatch");
     } else {
       // So it was in MIDSTATE, now extend the gear
-      servoTargetPos[SERVOLANDINGGEAR] = SERVOLANDINGGEARPOSEXTENDED;
+      //servoTargetPos[SERVOLANDINGGEAR] = SERVOLANDINGGEARPOSEXTENDED;
       Serial.println("Extend gear");
     }
   }
@@ -181,6 +178,6 @@ void UpdateServos(){
     servoActualPos[i] = servoActualPos[i]+posError;
 
     // Write the rounded off setpoint to the servo motor
-    myServo[i].write(int(servoActualPos[i]));
+    //myServo[i].write(int(servoActualPos[i]));
   }
 }
