@@ -15,7 +15,7 @@
 //
 // 2025-02-28, Jos Meuleman, Inholland Aeronautical & Precision Engineering, The Netherlands
 
-// these are local files that contain big chunks of code to make the main document more readable. 
+// These are local files that contain big chunks of code to make the main document more readable. 
 // Check the corresponding files in the tab
 #include "init.h"
 #include "customfunctions.h"
