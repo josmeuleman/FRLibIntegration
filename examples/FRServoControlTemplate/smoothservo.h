@@ -19,11 +19,9 @@ public:
     delete _Servo;
   }
 
-  void Init(byte pinNumber, float maxStep, byte startPos, byte endPos) {
+  void Init(byte pinNumber, float maxStep, byte startPos) {
     _pinNumber = pinNumber;
     _maxStep = maxStep;
-    _startPos = startPos;
-    _endPos = endPos;
     _targetPos = startPos;
     _actualPos = startPos;
     _Servo->attach(_pinNumber);
@@ -39,7 +37,7 @@ public:
     _actualPos += error;
     _Servo->write(int(_actualPos));
     Serial.print(_actualPos);
-    
+    Serial.print("; ");
   }
 
 private:
@@ -48,8 +46,6 @@ private:
   byte _targetPos;
   float _actualPos;
   float _maxStep;
-  byte _startPos;
-  byte _endPos;
 };
 
 //---------------------------------------------------------------------------------------------------------
