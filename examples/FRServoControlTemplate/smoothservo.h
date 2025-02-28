@@ -40,14 +40,13 @@ public:
   void SetTargetEnd(){
     _targetPos = _endPos;
   }
-  
 
   void Update() {
     float error = float(_targetPos) - _actualPos;
     error = max(-_maxStep, min(_maxStep, error));
     _actualPos += error;
     _Servo->write(int(_actualPos));
-    Serial.print(_actualPos);
+    Serial.print(int(_actualPos));
     Serial.print("; ");
   }
 
