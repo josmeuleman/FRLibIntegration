@@ -36,7 +36,7 @@ void setup() {
 
   for (int i=0; i<NUMBEROFSERVOS; i++) {
     float maxStep = MAXSERVOSPEEDDEGS[i]*LOOPTIMESERVOMS/1000.0;
-    myServo[i].Init(PINSERVO[i], maxStep, SERVOSTARTPOS[i], SERVOENDPOS[i]);
+    myServo[i].Init(PINSERVO[i], maxStep, SERVOSTARTPOS[i]);
   }
 
   myServoTimer.Start();
@@ -63,63 +63,33 @@ void loop() {
   // }
   // Serial.println();
 
-  //-------------------------------------------------------------------------------------------------------
-  // Process the controller channels
-  //-------------------------------------------------------------------------------------------------------
-  // Read switch SWA (high/low) for logging
-  loggerSwitchState = myReceiver.IsChannelHigh(LOGGERSWITCHCHANNEL);
-  
-  // Compare the state with the previous state:
-  startLogger = (loggerSwitchState < loggerSwitchStatePrev);  //if new state is LOW (0) and old state is HIGH (1)
-  stopLogger = (loggerSwitchState > loggerSwitchStatePrev);   //if new state is HIGH (1) and old state is LOW (1)
-  loggerSwitchStatePrev = loggerSwitchState; //update the previous state for the next loop
 
-  if  (startLogger) {
-    // insert code for starting logging
-    myLed.SetColor(BLUE);
-    Serial.println("Start logging");
-  }
-  if (stopLogger) {
-    // insert code for stopping logging
-    myLed.SetColor(GREEN);
-    Serial.println("Stop logging ");
-  }
 
   // Read switch SWB (high/mid/low) for landing gear. 
   HandleLandingGearSwitch(); //Update of landingGearAction and landingGearHatchAction
 
-  //-------------------------------------------------------------------------------------------------------
-  // Handle the motors
-  //-------------------------------------------------------------------------------------------------------
-  // UpdateServos();
-  // // for debugging, print some values. This debugging slows down your program
-  // for (int i = 0; i < NUMBEROFSERVOS; i++) {
-  //   Serial.print(servoActualPos[i]);
-  //   Serial.print("; ");
-  // }
-  // Serial.println();
 
+  myButton.Update();            // Read the state of the button
+  if (myButton.HasChangedUp()){
+    servoTargetUp = !servoTargetUp;
+    if (servoTargetUp) {
+      myServo[SERVOLANDINGGEAR].SetTargetPos(SERVOSTARTPOS[SERVOLANDINGGEAR]);
+    }
+    else {
+      myServo[SERVOLANDINGGEAR].SetTargetPos(SERVOENDPOS[SERVOLANDINGGEAR]);
+    }
+  }
   
-  //-------------------------------------------------------------------------------------------------------
-  // End of the loop
-  //-------------------------------------------------------------------------------------------------------
-  // Kill the time until
+  // Handle the motors. There are some debugging print statements in the Update function you want to remove to speed up the code. 
+  for (int i = 0; i < NUMBEROFSERVOS; i++) {
+    myServo[i].Update();
+  }
+  Serial.println();
+  
+  // At the end of the loop, WaitUntilEnd runs until the time until looptime has passed
   if (myServoTimer.WaitUntilEnd()) {
     Serial.println("Overrun!");
   }
-}
-
-//---------------------------------------------------------------------------------------------------------
-// FUNCTIONS
-// Here the custom functions are defined
-//---------------------------------------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------------------------------------
-// Function that prints an error to the serial port and makes the RGBLED red
-//---------------------------------------------------------------------------------------------------------
-void Error(String errorMessage) {
-  Serial.println(errorMessage);
-  myLed.SetColor(RED);
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -158,26 +128,3 @@ void HandleLandingGearSwitch(){
   landingGearSwitchStatePrev = landingGearSwitchState; //update the previous state for the next loop
 
 }
-
-//---------------------------------------------------------------------------------------------------------
-// Function that controls the servos to their setpoints with limited speed
-//---------------------------------------------------------------------------------------------------------
-// void UpdateServos(){
-//   for (int i = 0; i < NUMBEROFSERVOS; i++) {
-//     // Calculate the differrence between target and current position
-//     float posError = servoTargetPos[i] - servoActualPos[i];
-//     float maxStep = MAXSERVOSPEEDDEGS[i]*LOOPTIMESERVOMS/1000.0; //maximum step a servo can make in a loopcycle based on maximum speed
-//     if (posError > maxStep) {
-//       // if the difference is larger than the maximum step size, limit the step size
-//       posError = maxStep;
-//     }
-//     if (posError < -maxStep) {
-//       // same, but for negative values
-//       posError = -maxStep;
-//     }
-//     servoActualPos[i] = servoActualPos[i]+posError;
-
-//     // Write the rounded off setpoint to the servo motor
-//     //myServo[i].write(int(servoActualPos[i]));
-//   }
-// }
