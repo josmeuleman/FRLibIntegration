@@ -84,7 +84,6 @@ void setup() {
 // LOOP
 //---------------------------------------------------------------------------------------------------------
 void loop() {
-
   // Start or stop logger, depending on the button state
   StartStopLogger(myButton, myLED, myLogger, Serial, myOLED);
 
@@ -96,11 +95,8 @@ void loop() {
   // Update the OLED with a custom function 
   PrintGPSStatusToOLED(myGPSSensor, myOLED);
   
-  
-  // End of the loop
   // At the end of the loop, WaitUntilEnd runs until the time until looptime has passed
   if (myLoggerTimer.WaitUntilEnd()) {
     Serial.println("Overrun!");  // if there are delays in the loop, you will get overruns i.e. the loop took longer than the looptime
   }
-  //
 }
