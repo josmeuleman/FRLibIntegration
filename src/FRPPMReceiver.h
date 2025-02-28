@@ -14,7 +14,7 @@ const int PPMTHRESHMID = 1100;
 const int PPMTHRESHHIGH = 1350;
 
 // Some switches have three states. We make constants defining LOSTATE (-1), MIDSTATE (0) and HISTATE(1)
-typedef enum triStateSwitch {
+enum triStateSwitch {
 	LOSTATE = -1,
 	MIDSTATE,
 	HISTATE
