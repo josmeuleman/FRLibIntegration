@@ -1,6 +1,11 @@
 #ifndef INIT_H
 #define INIT_H
 
+//---------------------------------------------------------------------------------------------------------
+// INIT
+// Here libraries are loaded, and constants and variables are defined.
+//---------------------------------------------------------------------------------------------------------
+
 // Libraries from FRLibBasics
 #include <FRTimer.h>
 #include <FRLogger.h>
