@@ -91,7 +91,7 @@ void loop() {
   //-------------------------------------------------------------------------------------------------------
   // Handle the motors
   //-------------------------------------------------------------------------------------------------------
-  UpdateServos();
+  // UpdateServos();
   // // for debugging, print some values. This debugging slows down your program
   // for (int i = 0; i < NUMBEROFSERVOS; i++) {
   //   Serial.print(servoActualPos[i]);
@@ -162,22 +162,22 @@ void HandleLandingGearSwitch(){
 //---------------------------------------------------------------------------------------------------------
 // Function that controls the servos to their setpoints with limited speed
 //---------------------------------------------------------------------------------------------------------
-void UpdateServos(){
-  for (int i = 0; i < NUMBEROFSERVOS; i++) {
-    // Calculate the differrence between target and current position
-    float posError = servoTargetPos[i] - servoActualPos[i];
-    float maxStep = MAXSERVOSPEEDDEGS[i]*LOOPTIMESERVOMS/1000.0; //maximum step a servo can make in a loopcycle based on maximum speed
-    if (posError > maxStep) {
-      // if the difference is larger than the maximum step size, limit the step size
-      posError = maxStep;
-    }
-    if (posError < -maxStep) {
-      // same, but for negative values
-      posError = -maxStep;
-    }
-    servoActualPos[i] = servoActualPos[i]+posError;
+// void UpdateServos(){
+//   for (int i = 0; i < NUMBEROFSERVOS; i++) {
+//     // Calculate the differrence between target and current position
+//     float posError = servoTargetPos[i] - servoActualPos[i];
+//     float maxStep = MAXSERVOSPEEDDEGS[i]*LOOPTIMESERVOMS/1000.0; //maximum step a servo can make in a loopcycle based on maximum speed
+//     if (posError > maxStep) {
+//       // if the difference is larger than the maximum step size, limit the step size
+//       posError = maxStep;
+//     }
+//     if (posError < -maxStep) {
+//       // same, but for negative values
+//       posError = -maxStep;
+//     }
+//     servoActualPos[i] = servoActualPos[i]+posError;
 
-    // Write the rounded off setpoint to the servo motor
-    //myServo[i].write(int(servoActualPos[i]));
-  }
-}
+//     // Write the rounded off setpoint to the servo motor
+//     //myServo[i].write(int(servoActualPos[i]));
+//   }
+// }
