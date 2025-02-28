@@ -18,7 +18,7 @@ void Message(const String& _Message, RGBLED& _LED, rgbcolors _Color, HardwareSer
 //---------------------------------------------------------------------------------------------------------
 // Function that waits maximum x seconds. it returns true if within x seconds the button has been pushed
 //---------------------------------------------------------------------------------------------------------
-bool hasButtonBeenPressedDuringWait(int _WaitTimeSec, Button& inButton, HardwareSerial& _Serial, SSD1306AsciiWire& _OLED) {
+bool hasButtonBeenPressedDuringWait(int _WaitTimeSec, Button& _Button, HardwareSerial& _Serial, SSD1306AsciiWire& _OLED) {
   _Serial.printf("press the button for offset calibration within %d seconds, ", _WaitTimeSec);
   _Serial.println("else offset is not calibrated");
 
@@ -39,8 +39,8 @@ bool hasButtonBeenPressedDuringWait(int _WaitTimeSec, Button& inButton, Hardware
   bool isPressed = false;
   bool continueLoop = true;  // continue the loop until this is false
   while (continueLoop) {
-    inButton.Update();
-    if (inButton.HasChangedUp()) {  // button has been pushed, return true and quit the while loop
+    _Button.Update();
+    if (_Button.HasChangedUp()) {  // button has been pushed, return true and quit the while loop
       isPressed = true;
       continueLoop = false;
     }
@@ -90,20 +90,20 @@ void CalibrateSensors(FRBMP280& _AltitudeSensor, FRMPU9250& _IMUSensor) {
 //---------------------------------------------------------------------------------------------------------
 // Function that checks the button and starts / stops the logger
 //---------------------------------------------------------------------------------------------------------
-void StartStopLogger(Button& button, RGBLED& _LED, Logger& logger, HardwareSerial& _Serial, SSD1306AsciiWire& _OLED) {
+void StartStopLogger(Button& _Button, RGBLED& _LED, Logger& _Logger, HardwareSerial& _Serial, SSD1306AsciiWire& _OLED) {
   myButton.Update();            // Read the state of the button
-  if (button.HasChangedUp()) {  //Check if the state has changed from low to high
+  if (_Button.HasChangedUp()) {  //Check if the state has changed from low to high
     _OLED.clear();
-    if (!logger.IsLogging()) {  // It wasn't logging yet, so start logging
+    if (!_Logger.IsLogging()) {  // It wasn't logging yet, so start logging
       _Serial.println("Start logging");
-      if (!logger.StartLogger()) {
+      if (!_Logger.StartLogger()) {
         Message("Something went wrong with the start of the log", _LED, RED, _Serial, _OLED);
       } else {  // the actual start of the logging
-        Message(logger.GetLoggerFileName() + " opened", _LED, BLUE, _Serial, _OLED);
+        Message(_Logger.GetLoggerFileName() + " opened", _LED, BLUE, _Serial, _OLED);
       }
     } else {  // Else we were logging, so now stop logging
       _Serial.println("Stop logging");
-      if (!logger.StopLogger()) {
+      if (!_Logger.StopLogger()) {
         Message("Something went wrong with the stopping of the log", _LED, RED, _Serial, _OLED);
       } else {
         Message("Logfile closed", _LED, GREEN, _Serial, _OLED);
