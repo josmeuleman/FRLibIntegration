@@ -23,11 +23,12 @@ bool FRMPU9250::Init(TwoWire &myWire) {
 	
     if (!_myMPU->Begin()) {
         // Serial.println("MPU9250 not found!");
+        _isEnabled = false;
         return false;
     } else {
         // Serial.println("MPU9250 found!");
 		_myMPU->Read();
-		
+		_isEnabled = true;
         return true;
     }
 }
@@ -64,12 +65,14 @@ String FRMPU9250::HeaderString(){
 }
 
 String FRMPU9250::SensorString() {
-    if (!_myMPU->Read()) {
-        
-		//return "";
-    }
-	_myFilter->update(GetGx(), -GetGy(), -GetGz(), GetAx(), -GetAy(), -GetAz(), GetMx(), -GetMy(), -GetMz());
     String tempString;
+    if (!_isEnabled) {
+        for (int i = 0; i < 12; i++) {
+            tempString.concat("NAN; ");
+        }
+    }
+    else{
+	_myFilter->update(GetGx(), -GetGy(), -GetGz(), GetAx(), -GetAy(), -GetAz(), GetMx(), -GetMy(), -GetMz());
     
     tempString.concat(createFloatString(GetAx(), 3));
     tempString.concat(createFloatString(GetAy(), 3));
@@ -85,6 +88,6 @@ String FRMPU9250::SensorString() {
 	tempString.concat(createFloatString(GetHeading(), 1));
    
     tempString.concat(createFloatString(_myMPU->die_temp_c(), 1));
-    
+    }
     return tempString;
 }

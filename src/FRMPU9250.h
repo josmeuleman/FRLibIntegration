@@ -50,6 +50,7 @@ class FRMPU9250 : public FRSensor {
 		float _gy0 = 0.0;
 		float _gz0 = 0.0;
 		float _sampleFrequencyHz = 10.0; 
+		bool _isEnabled = true; 
 	
 };
 
