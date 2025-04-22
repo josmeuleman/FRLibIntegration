@@ -1,6 +1,7 @@
 // Wrapper for a AS5600 sensor. It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
 // 2024-03-15, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2025-04-22, Ruben Koningsveld, last update.
 
 #ifndef FRAS5600_h
 #define FRAS5600_h
@@ -26,6 +27,7 @@ class FRAS5600 : public FRSensor {
 
 	private:
 		AS5600* _myAS5600;
+		bool _isEnabled = true; 
 };
 
 #endif

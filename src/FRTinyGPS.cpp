@@ -1,6 +1,7 @@
 // Wrapper for a MPU6050 sensor. It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
 // 2024-03-07, Jos Meuleman, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2025-04-22, Ruben Koningsveld, last update.
 
 #include "FRTinyGPS.h"
 #include "FRGeneric.h"
@@ -15,14 +16,28 @@ FRTinyGPS::~FRTinyGPS(){
 
 bool FRTinyGPS::Init(){
   Serial2.begin(_BAUDGPS, SERIAL_8N1, _RX, _TX);
-  return true;
+  if (!Serial2) {
+    _isEnabled = false;
+    return false;
+  }
+  else {
+    _isEnabled = true;
+    return true;
+  }
 }
 
 bool FRTinyGPS::Init(float lat0Deg, float lon0Deg){
   Serial2.begin(_BAUDGPS, SERIAL_8N1, _RX, _TX);
   SetLat0(lat0Deg);
   SetLon0(lon0Deg);
-  return true;
+  if (!Serial2) {
+    _isEnabled = false;
+    return false;
+  }
+  else {
+    _isEnabled = true;
+    return true;
+  }
 }
 
 void FRTinyGPS::SetLat0( float lat0Deg ){
@@ -54,43 +69,47 @@ String FRTinyGPS::HeaderString(){
 
 String FRTinyGPS::SensorString(){
   long tStart = millis();
-  while ((Serial2.available() > 0) & (millis()-tStart < _TIMEOUTMS)){
-    _myGPS->encode(Serial2.read());
-  }	
   String tempString;
-  tempString.concat(createIntString(GetSatellites()));
-  if (_myGPS->date.isValid()) {
-	tempString.concat(createDateString(_myGPS->date.year(), _myGPS->date.month(), _myGPS->date.day()));
+  if (!_isEnabled){
+    for (int i = 0; i < 7; i++){
+      tempString.concat("NAN; ");
+    }
   }
   else {
-    tempString.concat(createDateString(9999, 99, 99));
-  }
-  
-  if (_myGPS->time.isValid()) {
-	tempString.concat(createTimeString(_myGPS->time.hour(), _myGPS->time.minute(), _myGPS->time.second()));
-  }
+    while ((Serial2.available() > 0) & (millis()-tStart < _TIMEOUTMS)){
+      _myGPS->encode(Serial2.read());
+    }
+    tempString.concat(createIntString(GetSatellites()));
+    if (_myGPS->date.isValid()) {
+	    tempString.concat(createDateString(_myGPS->date.year(), _myGPS->date.month(), _myGPS->date.day()));
+    }
+    else {
+      tempString.concat(createDateString(9999, 99, 99));
+    }
+    if (_myGPS->time.isValid()) {
+	    tempString.concat(createTimeString(_myGPS->time.hour(), _myGPS->time.minute(), _myGPS->time.second()));
+    }
+    else {
+      tempString.concat(createTimeString(99, 99, 99));
+    }
+    if (_myGPS->location.isValid()) {
+  	  tempString.concat(createFloatString(GetLatitude(), 6));
+	    tempString.concat(createFloatString(GetLongitude(), 6));
+	    tempString.concat(createFloatString(GetRelativeX(), 6));
+	    tempString.concat(createFloatString(GetRelativeY(), 6));
+    }
+    else {
+      tempString.concat(createFloatString(0, 6));
+	    tempString.concat(createFloatString(0, 6));  
+      tempString.concat(createFloatString(0, 6));
+	    tempString.concat(createFloatString(0, 6));  
+    }	  
+    if (_myGPS->altitude.isValid()) {
+	    tempString.concat(createFloatString(GetAltitude(), 1));
+    }
   else {
-    tempString.concat(createTimeString(99, 99, 99));
+ 	  tempString.concat(createFloatString(0, 1));
   }
-  
-  if (_myGPS->location.isValid()) {
-	tempString.concat(createFloatString(GetLatitude(), 6));
-	tempString.concat(createFloatString(GetLongitude(), 6));
-	tempString.concat(createFloatString(GetRelativeX(), 6));
-	tempString.concat(createFloatString(GetRelativeY(), 6));
-  }
-  else {
-    tempString.concat(createFloatString(0, 6));
-	tempString.concat(createFloatString(0, 6));  
-    tempString.concat(createFloatString(0, 6));
-	tempString.concat(createFloatString(0, 6));  
-  }	  
-  if (_myGPS->altitude.isValid()) {
-	tempString.concat(createFloatString(GetAltitude(), 1));
-  }
-  else {
- 	tempString.concat(createFloatString(0, 1));
-  }
-
-  return tempString;
+}
+return tempString;
 }

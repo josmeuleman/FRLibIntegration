@@ -1,6 +1,7 @@
 // Wrapper for a ms4525do (differential pressure, pitot). It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
 // 2024-03-07, Jos Meuleman & Tim van Cuylenborg, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2025-04-22, Ruben Koningsveld, last update.
 
 #ifndef FRMS4525DO_h
 #define FRMS4525DO_h
@@ -28,6 +29,7 @@ class FRMS4525DO : public FRSensor {
 		const int PITOT_I2C_ADDRESS = 0x28;     // I2C address of the Pitot sensor
 		float p0 = 0.0;
 		float rho = 1.204; // Density of air at 20 deg at 1013 hPa
+		bool _isEnabled = true; 
 };
 
 #endif

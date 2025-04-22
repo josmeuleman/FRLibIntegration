@@ -1,6 +1,7 @@
 // Wrapper for a MPU6050 sensor. It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
 // 2024-03-07, Jos Meuleman, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2025-04-22, Ruben Koningsveld, last update.
 
 #ifndef FRTinyGPS_h
 #define FRTinyGPS_h
@@ -42,6 +43,7 @@ class FRTinyGPS : public FRSensor {
   float _lat0Deg = 51.935751154805295; // location of model flying EMCR
   float _lon0Deg = 4.196820426972546;
   float _cosLat0 = cos( _DEG2RAD * _lat0Deg);
+  bool _isEnabled = true; 
   
 
 };

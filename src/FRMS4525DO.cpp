@@ -1,6 +1,7 @@
 // Wrapper for a ms4525do (differential pressure, pitot). It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
 // 2024-03-07, Jos Meuleman & Tim van Cuylenborg, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2025-04-22, Ruben Koningsveld, last update.
 
 #include "FRMS4525DO.h"
 #include "FRGeneric.h"
@@ -19,10 +20,12 @@ bool FRMS4525DO::Init(TwoWire &myWire){
   // Start communication with the Pitot Sensor. If this fails, the program will stop here
   if (!_myPitot->Begin()) {
     //Serial.println("Error communicating with ms4525do");
+    _isEnabled = false;
     return false;
   }
   else {
     //Serial.println("ms4525do found!");
+    _isEnabled = true;
 	return true;
   }
 }
@@ -36,12 +39,17 @@ String FRMS4525DO::HeaderString(){
 }
 
 String FRMS4525DO::SensorString(){
-  _myPitot->Read();
   String tempString;
-  
+  if (!_isEnabled) {
+    for (int i = 0; i < 2; i++) {
+        tempString.concat("NAN; ");
+    }
+  }
+  else {
+  _myPitot->Read();
   tempString.concat(createFloatString(GetPressure(), 2));
   tempString.concat(createFloatString(GetSpeed(), 2));
   tempString.concat(createFloatString(_myPitot->die_temp_c(), 1));
-  
+  }
   return tempString;
 }

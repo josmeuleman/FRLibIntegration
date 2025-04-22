@@ -1,6 +1,7 @@
 // Class for logging data to an SD card 
 // 
 // 2024-03-07, Jos Meuleman & Tim van Cuylenborg, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2025-04-22, Ruben Koningsveld, last update.
 
 #include "Arduino.h"
 #include "FRLogger.h"
@@ -15,7 +16,14 @@ Logger::Logger() {
 }
 
 bool Logger::CheckSD() {
-  return (SD.begin());
+  if (!SD.begin()) {  // Check if the SD card is present and can be initialized
+    _isEnabled = false;
+    return false;
+  }
+  else {
+    _isEnabled = true;
+    return true;
+  }
 }
 
 void Logger::AddSensor(FRSensor *Sensor){
@@ -32,7 +40,11 @@ bool Logger::IsLogging() {
 }
 
 bool Logger::StartLogger() {
-  if (_isLogging) {  // Already logging
+  if (_isLogging) {  // Already logging or SD card not plugged in
+    return false;
+  }
+
+  if (!_isEnabled) {  // SD card not plugged in
     return false;
   }
 
@@ -59,6 +71,10 @@ bool Logger::StopLogger() {
   }
 
   if (!_file) { // File not open
+    return false;
+  }
+
+  if (!_isEnabled) {  // SD card not plugged in
     return false;
   }
 

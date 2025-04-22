@@ -1,6 +1,7 @@
 // Class for logging data to an SD card 
 // 
 // 2024-03-07, Jos Meuleman & Tim van Cuylenborg, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2025-04-22, Ruben Koningsveld, last update.
 
 #ifndef FRLogger_h
 #define FRLogger_h
@@ -45,7 +46,7 @@ class Logger{
   File _file;
   String _loggerString;
   String _headerString;
-  
+  bool _isEnabled = true; 
   
 };
 

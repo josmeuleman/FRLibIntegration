@@ -1,6 +1,7 @@
 // Wrapper for a BMP280 sensor. It uses the FRSensor class, such that the Logger class can log the sensor.
 // 
 // 2024-03-21, Jos Meuleman & Christian Wong, Inholland Aeronautical & Precision Engineering, The Netherlands
+// 2025-04-22, Ruben Koningsveld, last update.
 
 #ifndef FRBMP280_h
 #define FRBMP280_h
@@ -25,6 +26,7 @@ class FRBMP280 : public FRSensor {
     private:
         Adafruit_BMP280* _myBMP;
         float _offsetPressure = 1013.25;
+        bool _isEnabled = true; 
 };
 
 #endif
